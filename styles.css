@@ -1,0 +1,217 @@
+/* Стили для плагина Pollinations AI Chat */
+
+/* Основной контейнер чата */
+.chat-container {
+    background: var(--background-primary);
+    border-radius: 8px;
+    margin: 10px 0;
+}
+
+/* Сообщения в чате */
+.chat-message {
+    margin-bottom: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    position: relative;
+}
+
+.user-message {
+    background: var(--background-secondary);
+    border-left: 4px solid var(--interactive-accent);
+    margin-left: 20px;
+}
+
+.assistant-message {
+    background: var(--background-modifier-hover);
+    border-left: 4px solid var(--text-accent);
+    margin-right: 20px;
+}
+
+/* Заголовок сообщения */
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+}
+
+.message-header strong {
+    color: var(--text-accent);
+}
+
+.message-header small {
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* Содержимое сообщения */
+.message-content {
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Селектор модели */
+.model-selector {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: var(--background-secondary);
+    border-radius: 6px;
+}
+
+.model-selector label {
+    margin-right: 10px;
+    font-weight: 500;
+    color: var(--text-normal);
+}
+
+/* Контейнер ввода */
+.input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.input-container input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 6px;
+    background: var(--background-primary);
+    color: var(--text-normal);
+}
+
+.input-container input:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+    box-shadow: 0 0 0 2px var(--interactive-accent-hover);
+}
+
+/* Кнопки */
+.button-container {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.button-container button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--interactive-normal);
+    color: var(--text-normal);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.button-container button:hover {
+    background: var(--interactive-hover);
+    border-color: var(--interactive-accent);
+}
+
+.button-container button:active {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent);
+}
+
+/* Индикатор загрузки */
+.loading-message {
+    text-align: center;
+    padding: 15px;
+    color: var(--text-muted);
+    font-style: italic;
+    background: var(--background-modifier-hover);
+    border-radius: 6px;
+    margin: 10px 0;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .input-container {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .input-container input {
+        width: 100%;
+    }
+    
+    .user-message, .assistant-message {
+        margin-left: 0;
+        margin-right: 0;
+    }
+    
+    .button-container {
+        flex-direction: column;
+    }
+    
+    .button-container button {
+        width: 100%;
+    }
+}
+
+/* Скроллбар для чата */
+.chat-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chat-container::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+    border-radius: 3px;
+}
+
+.chat-container::-webkit-scrollbar-thumb {
+    background: var(--background-modifier-border);
+    border-radius: 3px;
+}
+
+.chat-container::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* Выделение кода в сообщениях */
+.message-content code {
+    background: var(--code-background);
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: var(--font-monospace);
+    font-size: 0.9em;
+}
+
+.message-content pre {
+    background: var(--code-background);
+    padding: 10px;
+    border-radius: 6px;
+    overflow-x: auto;
+    border-left: 3px solid var(--interactive-accent);
+}
+
+.message-content pre code {
+    background: none;
+    padding: 0;
+}
+
+/* Анимация появления сообщений */
+.chat-message {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -1,0 +1,11 @@
+{
+	"id": "pollinations-ai-chat",
+	"name": "Pollinations AI Chat",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "Чат с ИИ через Pollinations API с сохранением в заметки",
+	"author": "Processor",
+	"authorUrl": "https://github.com/Processori7/",
+	"fundingUrl": "",
+	"isDesktopOnly": false
+}
