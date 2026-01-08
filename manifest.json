@@ -1,9 +1,9 @@
 {
-	"id": "pollinations-ai-chat",
-	"name": "Pollinations AI Chat",
+	"id": "polinations-ai-chat",
+	"name": "Polinations AI Chat",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Chat with AI via Pollinations API with saving messages to notes.",
+	"description": "Chat with AI via Polinations API with saving messages to notes.",
 	"author": "Processori7",
 	"authorUrl": "https://github.com/Processori7/",
 	"fundingUrl": "",
