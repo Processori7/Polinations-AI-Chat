@@ -229,7 +229,7 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
   async onload() {
     await this.loadSettings();
     this.currentModel = this.settings.defaultModel;
-    await this.loadModels();
+    void this.loadModels();
     this.addCommand({
       id: "open-ai-chat",
       name: this.t("openAIChat"),
@@ -462,7 +462,10 @@ var AIchatModal = class extends import_obsidian.Modal {
       if (!categories.has(category)) {
         categories.set(category, []);
       }
-      categories.get(category).push(model);
+      const categoryModels = categories.get(category);
+      if (categoryModels) {
+        categoryModels.push(model);
+      }
     });
     categories.forEach((models, category) => {
       models.forEach((model) => {
@@ -593,7 +596,10 @@ var QuickQuestionModal = class extends import_obsidian.Modal {
       if (!categories.has(category)) {
         categories.set(category, []);
       }
-      categories.get(category).push(model);
+      const categoryModels = categories.get(category);
+      if (categoryModels) {
+        categoryModels.push(model);
+      }
     });
     categories.forEach((models, category) => {
       models.forEach((model) => {
@@ -722,13 +728,13 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
       const result = await this.plugin.generateImage(prompt, model, width, height);
       loadingNotice.hide();
       if (result.error) {
-        new import_obsidian.Notice(`Error: ${result.error}`);
+        new import_obsidian.Notice(`${this.plugin.t("error")}: ${result.error}`);
         return;
       }
       if (result.imageData && result.filename) {
         const filePath = await this.plugin.saveImage(result.imageData, result.filename);
         if (filePath) {
-          new import_obsidian.Notice(`Image saved: ${filePath}`);
+          new import_obsidian.Notice(`${this.plugin.t("imageSaved")}: ${filePath}`);
           const activeFile = this.app.workspace.getActiveFile();
           if (activeFile) {
             const editor = (_a = this.app.workspace.activeEditor) == null ? void 0 : _a.editor;
@@ -739,12 +745,12 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
           }
           this.close();
         } else {
-          new import_obsidian.Notice("Failed to save image");
+          new import_obsidian.Notice(this.plugin.t("imageError"));
         }
       }
     } catch (error) {
       loadingNotice.hide();
-      new import_obsidian.Notice(`Error: ${error}`);
+      new import_obsidian.Notice(`${this.plugin.t("error")}: ${error}`);
     }
   }
   onClose() {
@@ -784,7 +790,10 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
         if (!categories.has(category)) {
           categories.set(category, []);
         }
-        categories.get(category).push(model);
+        const categoryModels = categories.get(category);
+        if (categoryModels) {
+          categoryModels.push(model);
+        }
       });
       categories.forEach((models, category) => {
         models.forEach((model) => {

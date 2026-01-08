@@ -201,6 +201,13 @@ interface ChatMessage {
 	timestamp: Date;
 }
 
+interface APIModelResponse {
+	name: string;
+	description?: string;
+	input_modalities?: string[];
+	is_specialized?: boolean;
+}
+
 export default class PollinationsAIPlugin extends Plugin {
 	settings: PollinationsAISettings;
 	models: AIModel[] = [];
@@ -244,7 +251,7 @@ export default class PollinationsAIPlugin extends Plugin {
 		this.currentModel = this.settings.defaultModel;
 
 		// Загружаем доступные модели
-		await this.loadModels();
+		void this.loadModels();
 
 		// Добавляем команду для открытия чата
 		this.addCommand({
@@ -323,8 +330,8 @@ export default class PollinationsAIPlugin extends Plugin {
 			// Process text models
 			if (textResponse.status === 200 && textResponse.json && Array.isArray(textResponse.json)) {
 				const textModels = textResponse.json
-					.filter((m: any) => !m.is_specialized) // Exclude specialized models (midijourney, chickytutor)
-					.map((model: any) => ({
+					.filter((m: APIModelResponse) => !m.is_specialized) // Exclude specialized models (midijourney, chickytutor)
+					.map((model: APIModelResponse) => ({
 						name: model.name,
 						description: model.description || model.name,
 						input_modalities: model.input_modalities || ['text']
@@ -335,8 +342,8 @@ export default class PollinationsAIPlugin extends Plugin {
 			// Process image models
 			if (imageResponse.status === 200 && imageResponse.json && Array.isArray(imageResponse.json)) {
 				const imageModels = imageResponse.json
-					.filter((m: any) => !m.is_specialized)
-					.map((model: any) => ({
+					.filter((m: APIModelResponse) => !m.is_specialized)
+					.map((model: APIModelResponse) => ({
 						name: model.name,
 						description: model.description || model.name,
 						input_modalities: model.input_modalities || ['text']
@@ -540,7 +547,10 @@ class AIchatModal extends Modal {
 			if (!categories.has(category)) {
 				categories.set(category, []);
 			}
-			categories.get(category)!.push(model);
+			const categoryModels = categories.get(category);
+			if (categoryModels) {
+				categoryModels.push(model);
+			}
 		});
 		
 		// Add models by category
@@ -726,7 +736,10 @@ class QuickQuestionModal extends Modal {
 			if (!categories.has(category)) {
 				categories.set(category, []);
 			}
-			categories.get(category)!.push(model);
+			const categoryModels = categories.get(category);
+			if (categoryModels) {
+				categoryModels.push(model);
+			}
 		});
 		
 		categories.forEach((models, category) => {
@@ -903,7 +916,7 @@ class ImageGenerationModal extends Modal {
 			loadingNotice.hide();
 
 			if (result.error) {
-				new Notice(`Error: ${result.error}`);
+				new Notice(`${this.plugin.t('error')}: ${result.error}`);
 				return;
 			}
 
@@ -911,7 +924,7 @@ class ImageGenerationModal extends Modal {
 				const filePath = await this.plugin.saveImage(result.imageData, result.filename);
 				
 				if (filePath) {
-					new Notice(`Image saved: ${filePath}`);
+					new Notice(`${this.plugin.t('imageSaved')}: ${filePath}`);
 					
 					// Insert image link into active note
 					const activeFile = this.app.workspace.getActiveFile();
@@ -924,12 +937,12 @@ class ImageGenerationModal extends Modal {
 					
 					this.close();
 				} else {
-					new Notice('Failed to save image');
+					new Notice(this.plugin.t('imageError'));
 				}
 			}
 		} catch (error) {
 			loadingNotice.hide();
-			new Notice(`Error: ${error}`);
+			new Notice(`${this.plugin.t('error')}: ${error}`);
 		}
 	}
 
@@ -996,7 +1009,10 @@ class PollinationsAISettingTab extends PluginSettingTab {
 					if (!categories.has(category)) {
 						categories.set(category, []);
 					}
-					categories.get(category)!.push(model);
+					const categoryModels = categories.get(category);
+					if (categoryModels) {
+						categoryModels.push(model);
+					}
 				});
 				
 				categories.forEach((models, category) => {
