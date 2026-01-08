@@ -26,8 +26,8 @@
 5. Включите плагин в настройках
 
 ### Вариант 2: Разработка
-1. Клонируйте репозиторий: `git clone https://github.com/Processori7/Obsidian_PolinationsAI.git`
-2. Переидите в папку `cd Obsidian_PolinationsAI`
+1. Клонируйте репозиторий: `git clone https://github.com/Processori7/Polinations-AI-Chat.git`
+2. Переидите в папку `cd Polinations-AI-Chat`
 3. Запустите `npm install`
 4. Запустите `npm run build`
 5. Перенесите файлы `main.js`, `manifest.json`, `styles.css` в папку `.obsidian/plugins/`

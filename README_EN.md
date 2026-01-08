@@ -26,8 +26,8 @@ A plugin for integration with Pollinations AI API, allowing you to chat with var
 5. Enable the plugin in settings
 
 ### Option 2: Development
-1. Clone the repository: `git clone https://github.com/Processori7/Obsidian_PolinationsAI.git`
-2. Navigate to folder: `cd Obsidian_PolinationsAI`
+1. Clone the repository: `git clone https://github.com/Processori7/Polinations-AI-Chat.git`
+2. Navigate to folder: `cd Polinations-AI-Chat`
 3. Run `npm install`
 4. Run `npm run build`
 5. Copy `main.js`, `manifest.json`, `styles.css` files to `.obsidian/plugins/` folder
