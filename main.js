@@ -384,9 +384,9 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
     });
     try {
       await this.app.vault.create(filePath, content);
-      new import_obsidian.Notice(`\u0427\u0430\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D \u0432: ${filePath}`);
+      new import_obsidian.Notice(`${this.t("chatSaved")} ${filePath}`);
     } catch (error) {
-      new import_obsidian.Notice(`\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F: ${error}`);
+      new import_obsidian.Notice(`${this.t("saveError")}: ${error}`);
     }
   }
   async loadSettings() {
@@ -633,7 +633,7 @@ var QuickQuestionModal = class extends import_obsidian.Modal {
       const messages = [{ role: "user", content: question }];
       const response = await this.plugin.communicateWithAI(selectedModel, messages);
       if (response.error) {
-        new import_obsidian.Notice(`\u041E\u0448\u0438\u0431\u043A\u0430: ${response.error}`);
+        new import_obsidian.Notice(`${this.plugin.t("error")}: ${response.error}`);
         return;
       }
       if (response.choices && response.choices[0] && response.choices[0].message) {
@@ -643,13 +643,13 @@ var QuickQuestionModal = class extends import_obsidian.Modal {
           { role: "assistant", content: answer, timestamp: /* @__PURE__ */ new Date() }
         ];
         await this.plugin.saveConversationToNote(conversation, "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441");
-        new import_obsidian.Notice("\u041E\u0442\u0432\u0435\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0443");
+        new import_obsidian.Notice(this.plugin.t("answerSaved"));
         this.close();
       } else {
-        new import_obsidian.Notice("\u041F\u043E\u043B\u0443\u0447\u0435\u043D \u043D\u0435\u043E\u0436\u0438\u0434\u0430\u043D\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442 \u043E\u0442 API");
+        new import_obsidian.Notice(this.plugin.t("unexpectedResponse"));
       }
     } catch (error) {
-      new import_obsidian.Notice(`\u041E\u0448\u0438\u0431\u043A\u0430: ${error}`);
+      new import_obsidian.Notice(`${this.plugin.t("error")}: ${error}`);
     }
   }
   onClose() {

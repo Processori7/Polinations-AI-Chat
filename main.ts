@@ -438,9 +438,9 @@ export default class PollinationsAIPlugin extends Plugin {
 
 		try {
 			await this.app.vault.create(filePath, content);
-			new Notice(`Чат сохранен в: ${filePath}`);
+			new Notice(`${this.t('chatSaved')} ${filePath}`);
 		} catch (error) {
-			new Notice(`Ошибка сохранения: ${error}`);
+			new Notice(`${this.t('saveError')}: ${error}`);
 		}
 	}
 
@@ -785,7 +785,7 @@ class QuickQuestionModal extends Modal {
 			const response = await this.plugin.communicateWithAI(selectedModel, messages);
 			
 			if (response.error) {
-				new Notice(`Ошибка: ${response.error}`);
+				new Notice(`${this.plugin.t('error')}: ${response.error}`);
 				return;
 			}
 
@@ -799,13 +799,13 @@ class QuickQuestionModal extends Modal {
 				];
 				
 				await this.plugin.saveConversationToNote(conversation, 'Быстрый вопрос');
-				new Notice('Ответ сохранен в заметку');
+				new Notice(this.plugin.t('answerSaved'));
 				this.close();
 			} else {
-				new Notice('Получен неожиданный ответ от API');
+				new Notice(this.plugin.t('unexpectedResponse'));
 			}
 		} catch (error) {
-			new Notice(`Ошибка: ${error}`);
+			new Notice(`${this.plugin.t('error')}: ${error}`);
 		}
 	}
 
