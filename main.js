@@ -31,13 +31,200 @@ var import_obsidian = require("obsidian");
 var DEFAULT_SETTINGS = {
   defaultModel: "openai",
   saveToNotes: true,
-  notesFolder: "\u0427\u0430\u0442\u044B \u0441 \u0418\u0418",
-  apiToken: ""
+  notesFolder: "AI Chats",
+  apiToken: "",
+  imagesFolder: "AI Images",
+  defaultImageModel: "zimage",
+  language: "en",
+  showFreeModelsOnly: false
+};
+var TRANSLATIONS = {
+  en: {
+    // Commands
+    openAIChat: "Open AI chat",
+    quickAIQuestion: "Quick AI question",
+    generateAIImage: "Generate AI image",
+    aiChat: "AI chat",
+    // Modal titles
+    aiChatTitle: "AI chat",
+    quickQuestionTitle: "Quick AI question",
+    imageGenerationTitle: "Generate AI image",
+    // Labels
+    model: "Model",
+    prompt: "Prompt",
+    size: "Size",
+    yourQuestion: "Your question",
+    // Placeholders
+    enterQuestion: "Enter your question...",
+    enterPrompt: "Describe the image you want to generate...",
+    enterToken: "Enter token...",
+    // Buttons
+    send: "Send",
+    saveChat: "Save chat",
+    clear: "Clear",
+    ask: "Ask",
+    cancel: "Cancel",
+    generate: "Generate",
+    // Messages
+    thinking: "Thinking...",
+    noMessages: "No messages to save",
+    enterQuestionMsg: "Enter a question",
+    enterPromptMsg: "Enter a prompt",
+    chatSaved: "Chat saved to",
+    saveError: "Save error",
+    imageSaved: "Image saved",
+    imageError: "Failed to save image",
+    generating: "Generating image...",
+    answerSaved: "Answer saved to note",
+    unexpectedResponse: "Unexpected API response",
+    error: "Error",
+    // User/AI labels
+    user: "You",
+    ai: "AI",
+    // Settings
+    settingsTitle: "Pollinations AI settings",
+    defaultModel: "Default model",
+    defaultModelDesc: "Select default AI model",
+    saveChatsToNotes: "Save chats to notes",
+    saveChatsDesc: "Automatically save AI conversations to notes",
+    notesFolder: "Notes folder",
+    notesFolderDesc: "Folder where AI chats will be saved",
+    apiToken: "API token",
+    apiTokenDesc: "Access token for API (optional)",
+    imagesFolder: "Images folder",
+    imagesFolderDesc: "Folder where generated images will be saved",
+    defaultImageModel: "Default image model",
+    defaultImageModelDesc: "Default model for image generation",
+    language: "Language",
+    languageDesc: "Interface language",
+    showFreeModelsOnly: "Show only free models",
+    showFreeModelsOnlyDesc: "Show only models that work without API key",
+    // Model categories
+    categoryText: "Text",
+    categoryImages: "Images",
+    categoryAudio: "Audio",
+    // Image models
+    imageModelZimage: "Zimage (Default)",
+    imageModelFlux: "Flux",
+    imageModelTurbo: "Turbo (Fast)",
+    imageModelGPT: "GPT Image",
+    imageModelKontext: "Kontext",
+    imageModelSeeDream: "SeeDream",
+    imageModelNanobanana: "Nanobanana"
+  },
+  ru: {
+    // Commands
+    openAIChat: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0418\u0418 \u0447\u0430\u0442",
+    quickAIQuestion: "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441 \u0418\u0418",
+    generateAIImage: "\u0413\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0418\u0418 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435",
+    aiChat: "\u0418\u0418 \u0447\u0430\u0442",
+    // Modal titles
+    aiChatTitle: "\u0418\u0418 \u0447\u0430\u0442",
+    quickQuestionTitle: "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441 \u0418\u0418",
+    imageGenerationTitle: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0418\u0418 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F",
+    // Labels
+    model: "\u041C\u043E\u0434\u0435\u043B\u044C",
+    prompt: "\u041F\u0440\u043E\u043C\u043F\u0442",
+    size: "\u0420\u0430\u0437\u043C\u0435\u0440",
+    yourQuestion: "\u0412\u0430\u0448 \u0432\u043E\u043F\u0440\u043E\u0441",
+    // Placeholders
+    enterQuestion: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0432\u0430\u0448 \u0432\u043E\u043F\u0440\u043E\u0441...",
+    enterPrompt: "\u041E\u043F\u0438\u0448\u0438\u0442\u0435 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435, \u043A\u043E\u0442\u043E\u0440\u043E\u0435 \u0445\u043E\u0442\u0438\u0442\u0435 \u0441\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C...",
+    enterToken: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u043E\u043A\u0435\u043D...",
+    // Buttons
+    send: "\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C",
+    saveChat: "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0447\u0430\u0442",
+    clear: "\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C",
+    ask: "\u0421\u043F\u0440\u043E\u0441\u0438\u0442\u044C",
+    cancel: "\u041E\u0442\u043C\u0435\u043D\u0430",
+    generate: "\u0413\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C",
+    // Messages
+    thinking: "\u0414\u0443\u043C\u0430\u044E...",
+    noMessages: "\u041D\u0435\u0442 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0439 \u0434\u043B\u044F \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F",
+    enterQuestionMsg: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0432\u043E\u043F\u0440\u043E\u0441",
+    enterPromptMsg: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043F\u0440\u043E\u043C\u043F\u0442",
+    chatSaved: "\u0427\u0430\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D \u0432",
+    saveError: "\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F",
+    imageSaved: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E",
+    imageError: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435",
+    generating: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F...",
+    answerSaved: "\u041E\u0442\u0432\u0435\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
+    unexpectedResponse: "\u041F\u043E\u043B\u0443\u0447\u0435\u043D \u043D\u0435\u043E\u0436\u0438\u0434\u0430\u043D\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442 \u043E\u0442 API",
+    error: "\u041E\u0448\u0438\u0431\u043A\u0430",
+    // User/AI labels
+    user: "\u0412\u044B",
+    ai: "\u0418\u0418",
+    // Settings
+    settingsTitle: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 Pollinations AI",
+    defaultModel: "\u041C\u043E\u0434\u0435\u043B\u044C \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+    defaultModelDesc: "\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043C\u043E\u0434\u0435\u043B\u044C \u0418\u0418 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+    saveChatsToNotes: "\u0421\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C \u0447\u0430\u0442\u044B \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0438",
+    saveChatsDesc: "\u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C \u0440\u0430\u0437\u0433\u043E\u0432\u043E\u0440\u044B \u0441 \u0418\u0418 \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0438",
+    notesFolder: "\u041F\u0430\u043F\u043A\u0430 \u0434\u043B\u044F \u0437\u0430\u043C\u0435\u0442\u043E\u043A",
+    notesFolderDesc: "\u041F\u0430\u043F\u043A\u0430, \u043A\u0443\u0434\u0430 \u0431\u0443\u0434\u0443\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C\u0441\u044F \u0447\u0430\u0442\u044B \u0441 \u0418\u0418",
+    apiToken: "API \u0442\u043E\u043A\u0435\u043D",
+    apiTokenDesc: "\u0422\u043E\u043A\u0435\u043D \u0434\u043B\u044F \u0434\u043E\u0441\u0442\u0443\u043F\u0430 \u043A API (\u043E\u043F\u0446\u0438\u043E\u043D\u0430\u043B\u044C\u043D\u043E)",
+    imagesFolder: "\u041F\u0430\u043F\u043A\u0430 \u0434\u043B\u044F \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439",
+    imagesFolderDesc: "\u041F\u0430\u043F\u043A\u0430, \u043A\u0443\u0434\u0430 \u0431\u0443\u0434\u0443\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C\u0441\u044F \u0441\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F",
+    defaultImageModel: "\u041C\u043E\u0434\u0435\u043B\u044C \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+    defaultImageModelDesc: "\u041C\u043E\u0434\u0435\u043B\u044C \u0434\u043B\u044F \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+    language: "\u042F\u0437\u044B\u043A",
+    languageDesc: "\u042F\u0437\u044B\u043A \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430",
+    showFreeModelsOnly: "\u041F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0442\u044C \u0442\u043E\u043B\u044C\u043A\u043E \u0431\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u044B\u0435 \u043C\u043E\u0434\u0435\u043B\u0438",
+    showFreeModelsOnlyDesc: "\u041F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0442\u044C \u0442\u043E\u043B\u044C\u043A\u043E \u043C\u043E\u0434\u0435\u043B\u0438, \u0440\u0430\u0431\u043E\u0442\u0430\u044E\u0449\u0438\u0435 \u0431\u0435\u0437 API \u043A\u043B\u044E\u0447\u0430",
+    // Model categories
+    categoryText: "\u0422\u0435\u043A\u0441\u0442",
+    categoryImages: "\u041A\u0430\u0440\u0442\u0438\u043D\u043A\u0438",
+    categoryAudio: "\u0410\u0443\u0434\u0438\u043E",
+    // Image models
+    imageModelZimage: "Zimage (\u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E)",
+    imageModelFlux: "Flux",
+    imageModelTurbo: "Turbo (\u0431\u044B\u0441\u0442\u0440\u0430\u044F)",
+    imageModelGPT: "GPT Image",
+    imageModelKontext: "Kontext",
+    imageModelSeeDream: "SeeDream",
+    imageModelNanobanana: "Nanobanana"
+  }
 };
 var PollinationsAIPlugin = class extends import_obsidian.Plugin {
   constructor() {
     super(...arguments);
     this.models = [];
+  }
+  t(key) {
+    return TRANSLATIONS[this.settings.language][key];
+  }
+  getCategoryForModel(modelName) {
+    const name = modelName.toLowerCase();
+    if (name.includes("flux") || name === "turbo" || name === "gptimage" || name === "kontext" || name.includes("seedream") || name.includes("nanobanana") || name === "zimage" || name === "veo" || name.includes("seedance")) {
+      return this.t("categoryImages");
+    }
+    if (name.includes("audio") || name.includes("tts") || name.includes("speech") || name.includes("midijourney")) {
+      return this.t("categoryAudio");
+    }
+    return this.t("categoryText");
+  }
+  isModelFree(modelName) {
+    const name = modelName.toLowerCase();
+    const freeModels = [
+      // Text models (cheapest)
+      "openai",
+      "openai-fast",
+      "qwen-coder",
+      "mistral",
+      "gemini-fast",
+      "nova-micro",
+      "deepseek",
+      // Image models (basic free tier)
+      "flux",
+      "turbo",
+      "gptimage",
+      "kontext",
+      "seedream",
+      "nanobanana",
+      "zimage"
+    ];
+    return freeModels.includes(name);
   }
   async onload() {
     await this.loadSettings();
@@ -45,103 +232,128 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
     await this.loadModels();
     this.addCommand({
       id: "open-ai-chat",
-      name: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0418\u0418 \u0447\u0430\u0442",
+      name: this.t("openAIChat"),
       callback: () => {
         new AIchatModal(this.app, this).open();
       }
     });
     this.addCommand({
       id: "quick-ai-question",
-      name: "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441 \u0418\u0418",
+      name: this.t("quickAIQuestion"),
       callback: () => {
         new QuickQuestionModal(this.app, this).open();
       }
     });
+    this.addCommand({
+      id: "generate-ai-image",
+      name: this.t("generateAIImage"),
+      callback: () => {
+        new ImageGenerationModal(this.app, this).open();
+      }
+    });
     this.addSettingTab(new PollinationsAISettingTab(this.app, this));
-    this.addRibbonIcon("message-circle", "\u0418\u0418 \u0427\u0430\u0442", (evt) => {
+    this.addRibbonIcon("message-circle", this.t("aiChat"), (evt) => {
       new AIchatModal(this.app, this).open();
     });
   }
   async loadModels() {
+    const defaultModels = [
+      { name: "openai", description: "OpenAI GPT-5 Mini", input_modalities: ["text"] },
+      { name: "mistral", description: "Mistral Small", input_modalities: ["text"] },
+      { name: "gemini-fast", description: "Gemini Flash Lite", input_modalities: ["text"] },
+      { name: "qwen-coder", description: "Qwen Coder", input_modalities: ["text"] },
+      { name: "flux", description: "Flux Image Generator", input_modalities: ["text"] },
+      { name: "turbo", description: "Turbo Image (Fast)", input_modalities: ["text"] }
+    ];
     try {
-      const response = await fetch("https://text.pollinations.ai/models");
-      if (response.ok) {
-        const models = await response.json();
-        this.models = models.map((model) => {
-          let input_modalities = model.input_modalities || [];
-          if (!input_modalities.length) {
-            if (model.name.toLowerCase().includes("openai")) {
-              input_modalities = ["text", "image"];
-            } else if (model.name.toLowerCase().includes("audio")) {
-              input_modalities = ["text", "audio"];
-            } else {
-              input_modalities = ["text"];
-            }
-          }
-          return {
-            name: model.name,
-            description: model.description || "\u0411\u0435\u0437 \u043E\u043F\u0438\u0441\u0430\u043D\u0438\u044F",
-            input_modalities
-          };
-        });
-      } else {
-        this.models = [{
-          name: "openai",
-          description: "OpenAI GPT-4o Mini",
-          input_modalities: ["text"]
-        }];
+      const headers = {};
+      if (this.settings.apiToken) {
+        headers["Authorization"] = `Bearer ${this.settings.apiToken}`;
       }
+      const textResponse = await (0, import_obsidian.requestUrl)({
+        url: "https://gen.pollinations.ai/text/models",
+        method: "GET",
+        headers,
+        throw: false
+      });
+      const imageResponse = await (0, import_obsidian.requestUrl)({
+        url: "https://gen.pollinations.ai/image/models",
+        method: "GET",
+        headers,
+        throw: false
+      });
+      console.debug("Text models response:", textResponse);
+      console.debug("Image models response:", imageResponse);
+      const allModels = [];
+      if (textResponse.status === 200 && textResponse.json && Array.isArray(textResponse.json)) {
+        const textModels = textResponse.json.filter((m) => !m.is_specialized).map((model) => ({
+          name: model.name,
+          description: model.description || model.name,
+          input_modalities: model.input_modalities || ["text"]
+        }));
+        allModels.push(...textModels);
+      }
+      if (imageResponse.status === 200 && imageResponse.json && Array.isArray(imageResponse.json)) {
+        const imageModels = imageResponse.json.filter((m) => !m.is_specialized).map((model) => ({
+          name: model.name,
+          description: model.description || model.name,
+          input_modalities: model.input_modalities || ["text"]
+        }));
+        allModels.push(...imageModels);
+      }
+      if (allModels.length > 0) {
+        this.models = allModels;
+        console.debug("Loaded models:", this.models);
+        return;
+      }
+      console.warn("API response not valid, using default models");
+      this.models = defaultModels;
     } catch (error) {
-      console.error("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u043C\u043E\u0434\u0435\u043B\u0435\u0439:", error);
-      this.models = [{
-        name: "openai",
-        description: "OpenAI GPT-4o Mini",
-        input_modalities: ["text"]
-      }];
+      console.warn("\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u043C\u043E\u0434\u0435\u043B\u0438 \u0438\u0437 API, \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u043C \u0441\u043F\u0438\u0441\u043E\u043A \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E:", error);
+      this.models = defaultModels;
     }
   }
   async communicateWithAI(modelName, messages) {
     try {
-      const lastUserMessage = messages.filter((msg) => msg.role === "user").pop();
-      if (!lastUserMessage) {
-        return { error: "\u041D\u0435\u0442 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u044F \u043F\u043E\u043B\u044C\u0437\u043E\u0432\u0430\u0442\u0435\u043B\u044F" };
+      const headers = {
+        "Content-Type": "application/json"
+      };
+      if (this.settings.apiToken) {
+        headers["Authorization"] = `Bearer ${this.settings.apiToken}`;
       }
-      const encodedPrompt = `'${lastUserMessage.content}'`;
-      const url = new URL(`https://text.pollinations.ai/${encodedPrompt}`);
-      url.searchParams.set("model", modelName);
-      url.searchParams.set("private", "true");
-      console.log("Pollinations API \u0437\u0430\u043F\u0440\u043E\u0441:", {
-        url: url.toString(),
+      const requestBody = {
         model: modelName,
-        prompt: lastUserMessage.content
+        messages,
+        private: true
+      };
+      console.debug("Pollinations API \u0437\u0430\u043F\u0440\u043E\u0441:", {
+        url: "https://gen.pollinations.ai/v1/chat/completions",
+        model: modelName,
+        messages
       });
-      const response = await fetch(url.toString(), {
-        method: "GET"
+      const response = await (0, import_obsidian.requestUrl)({
+        url: "https://gen.pollinations.ai/v1/chat/completions",
+        method: "POST",
+        headers,
+        body: JSON.stringify(requestBody),
+        throw: false
       });
-      if (response.ok) {
-        const text = await response.text();
-        return {
-          choices: [{
-            message: {
-              content: text
-            }
-          }]
-        };
+      if (response.status === 200 && response.json) {
+        return response.json;
       } else {
-        return { error: `HTTP ${response.status}: ${response.statusText}` };
+        return { error: `HTTP ${response.status}` };
       }
     } catch (error) {
       return { error: error.toString() };
     }
   }
   async saveConversationToNote(conversation, title) {
-    if (!this.settings.saveToNotes)
-      return;
+    if (!this.settings.saveToNotes) return;
     const folderPath = this.settings.notesFolder;
     if (!this.app.vault.getAbstractFileByPath(folderPath)) {
       await this.app.vault.createFolder(folderPath);
     }
-    const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, "-");
+    const timestamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-");
     const fileName = `${title || "\u0418\u0418 \u0447\u0430\u0442"} ${timestamp}.md`;
     const filePath = `${folderPath}/${fileName}`;
     let content = `# ${title || "\u0418\u0418 \u0447\u0430\u0442"}
@@ -149,7 +361,7 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
 `;
     content += `**\u041C\u043E\u0434\u0435\u043B\u044C:** ${this.currentModel}
 `;
-    content += `**\u0414\u0430\u0442\u0430:** ${new Date().toLocaleString("ru-RU")}
+    content += `**\u0414\u0430\u0442\u0430:** ${(/* @__PURE__ */ new Date()).toLocaleString("ru-RU")}
 
 `;
     content += `---
@@ -183,6 +395,52 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
   async saveSettings() {
     await this.saveData(this.settings);
   }
+  async generateImage(prompt, model = "zimage", width = 1024, height = 1024) {
+    try {
+      if (!this.settings.apiToken) {
+        return { error: "API key required for image generation. Please add it in settings." };
+      }
+      const url = new URL(`https://gen.pollinations.ai/image/${encodeURIComponent(prompt)}`);
+      url.searchParams.set("model", model);
+      url.searchParams.set("width", width.toString());
+      url.searchParams.set("height", height.toString());
+      url.searchParams.set("nologo", "true");
+      url.searchParams.set("private", "true");
+      url.searchParams.set("key", this.settings.apiToken);
+      const response = await (0, import_obsidian.requestUrl)({
+        url: url.toString(),
+        method: "GET",
+        throw: false
+      });
+      if (response.status === 200 && response.arrayBuffer) {
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-");
+        const filename = `ai-image-${timestamp}.png`;
+        return {
+          imageData: response.arrayBuffer,
+          filename
+        };
+      } else {
+        const errorText = response.text || response.json ? JSON.stringify(response.json) : "Unknown error";
+        return { error: `HTTP ${response.status}: ${errorText}` };
+      }
+    } catch (error) {
+      return { error: error.toString() };
+    }
+  }
+  async saveImage(imageData, filename) {
+    try {
+      const folderPath = this.settings.imagesFolder;
+      if (!this.app.vault.getAbstractFileByPath(folderPath)) {
+        await this.app.vault.createFolder(folderPath);
+      }
+      const filePath = `${folderPath}/${filename}`;
+      await this.app.vault.createBinary(filePath, imageData);
+      return filePath;
+    } catch (error) {
+      console.error("Error saving image:", error);
+      return null;
+    }
+  }
 };
 var AIchatModal = class extends import_obsidian.Modal {
   constructor(app, plugin) {
@@ -193,27 +451,33 @@ var AIchatModal = class extends import_obsidian.Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.createEl("h2", { text: "\u0418\u0418 \u0427\u0430\u0442" });
+    contentEl.createEl("h2", { text: this.plugin.t("aiChatTitle") });
     const modelContainer = contentEl.createDiv("model-selector");
-    modelContainer.createEl("label", { text: "\u041C\u043E\u0434\u0435\u043B\u044C: " });
+    modelContainer.createEl("label", { text: this.plugin.t("model") + ":" });
     this.modelSelect = new import_obsidian.DropdownComponent(modelContainer);
-    this.plugin.models.forEach((model) => {
-      this.modelSelect.addOption(model.name, `${model.name} - ${model.description}`);
+    const modelsToShow = this.plugin.settings.showFreeModelsOnly ? this.plugin.models.filter((m) => this.plugin.isModelFree(m.name)) : this.plugin.models;
+    const categories = /* @__PURE__ */ new Map();
+    modelsToShow.forEach((model) => {
+      const category = this.plugin.getCategoryForModel(model.name);
+      if (!categories.has(category)) {
+        categories.set(category, []);
+      }
+      categories.get(category).push(model);
+    });
+    categories.forEach((models, category) => {
+      models.forEach((model) => {
+        this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
+      });
     });
     this.modelSelect.setValue(this.plugin.currentModel);
     this.modelSelect.onChange((value) => {
       this.plugin.currentModel = value;
     });
     this.chatContainer = contentEl.createDiv("chat-container");
-    this.chatContainer.style.height = "400px";
-    this.chatContainer.style.overflowY = "auto";
-    this.chatContainer.style.border = "1px solid var(--background-modifier-border)";
-    this.chatContainer.style.padding = "10px";
-    this.chatContainer.style.marginBottom = "10px";
     const inputContainer = contentEl.createDiv("input-container");
     this.inputElement = new import_obsidian.TextComponent(inputContainer);
-    this.inputElement.inputEl.placeholder = "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0432\u0430\u0448 \u0432\u043E\u043F\u0440\u043E\u0441...";
-    this.inputElement.inputEl.style.width = "70%";
+    this.inputElement.inputEl.placeholder = this.plugin.t("enterQuestion");
+    this.inputElement.inputEl.addClass("input-wide");
     this.inputElement.inputEl.addEventListener("keypress", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
@@ -221,67 +485,81 @@ var AIchatModal = class extends import_obsidian.Modal {
       }
     });
     const sendButton = new import_obsidian.ButtonComponent(inputContainer);
-    sendButton.setButtonText("\u041E\u0442\u043F\u0440\u0430\u0432\u0438\u0442\u044C");
+    sendButton.setButtonText(this.plugin.t("send"));
     sendButton.onClick(() => this.sendMessage());
     const buttonContainer = contentEl.createDiv("button-container");
-    buttonContainer.style.marginTop = "10px";
     const saveButton = new import_obsidian.ButtonComponent(buttonContainer);
-    saveButton.setButtonText("\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0447\u0430\u0442");
+    saveButton.setButtonText(this.plugin.t("saveChat"));
     saveButton.onClick(() => this.saveChat());
     const clearButton = new import_obsidian.ButtonComponent(buttonContainer);
-    clearButton.setButtonText("\u041E\u0447\u0438\u0441\u0442\u0438\u0442\u044C");
+    clearButton.setButtonText(this.plugin.t("clear"));
     clearButton.onClick(() => this.clearChat());
   }
   async sendMessage() {
     const message = this.inputElement.getValue().trim();
-    if (!message)
-      return;
+    if (!message) return;
     this.addMessage("user", message);
     this.inputElement.setValue("");
+    const isImageModel = this.plugin.getCategoryForModel(this.plugin.currentModel) === this.plugin.t("categoryImages");
     const loadingEl = this.chatContainer.createDiv("loading-message");
-    loadingEl.textContent = "\u{1F916} \u0414\u0443\u043C\u0430\u044E...";
+    loadingEl.textContent = "\u{1F916} " + this.plugin.t("thinking");
     try {
-      const messages = this.conversation.map((msg) => ({
-        role: msg.role,
-        content: msg.content
-      }));
-      const response = await this.plugin.communicateWithAI(this.plugin.currentModel, messages);
-      loadingEl.remove();
-      if (response.error) {
-        this.addMessage("assistant", `\u041E\u0448\u0438\u0431\u043A\u0430: ${response.error}`);
-      } else if (response.choices && response.choices[0] && response.choices[0].message) {
-        this.addMessage("assistant", response.choices[0].message.content);
+      if (isImageModel) {
+        const result = await this.plugin.generateImage(message, this.plugin.currentModel, 1024, 1024);
+        loadingEl.remove();
+        if (result.error) {
+          this.addMessage("assistant", `${this.plugin.t("error")}: ${result.error}`);
+        } else if (result.imageData && result.filename) {
+          const filePath = await this.plugin.saveImage(result.imageData, result.filename);
+          if (filePath) {
+            this.addMessage("assistant", `${this.plugin.t("imageSaved")}: [[${filePath}]]`);
+          } else {
+            this.addMessage("assistant", this.plugin.t("imageError"));
+          }
+        }
       } else {
-        this.addMessage("assistant", "\u041F\u043E\u043B\u0443\u0447\u0435\u043D \u043D\u0435\u043E\u0436\u0438\u0434\u0430\u043D\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442 \u043E\u0442 API");
+        const messages = this.conversation.map((msg) => ({
+          role: msg.role,
+          content: msg.content
+        }));
+        const response = await this.plugin.communicateWithAI(this.plugin.currentModel, messages);
+        loadingEl.remove();
+        if (response.error) {
+          this.addMessage("assistant", `${this.plugin.t("error")}: ${response.error}`);
+        } else if (response.choices && response.choices[0] && response.choices[0].message) {
+          this.addMessage("assistant", response.choices[0].message.content);
+        } else {
+          this.addMessage("assistant", this.plugin.t("unexpectedResponse"));
+        }
       }
     } catch (error) {
       loadingEl.remove();
-      this.addMessage("assistant", `\u041E\u0448\u0438\u0431\u043A\u0430: ${error}`);
+      this.addMessage("assistant", `${this.plugin.t("error")}: ${error}`);
     }
   }
   addMessage(role, content) {
     const message = {
       role,
       content,
-      timestamp: new Date()
+      timestamp: /* @__PURE__ */ new Date()
     };
     this.conversation.push(message);
     const messageEl = this.chatContainer.createDiv("chat-message");
     messageEl.addClass(role === "user" ? "user-message" : "assistant-message");
     const roleIcon = role === "user" ? "\u{1F464}" : "\u{1F916}";
-    const roleText = role === "user" ? "\u0412\u044B" : "\u0418\u0418";
-    messageEl.innerHTML = `
-			<div class="message-header">
-				<strong>${roleIcon} ${roleText}</strong>
-				<small>${message.timestamp.toLocaleTimeString("ru-RU")}</small>
-			</div>
-			<div class="message-content">${content}</div>
-		`;
+    const roleText = role === "user" ? this.plugin.t("user") : this.plugin.t("ai");
+    const headerDiv = messageEl.createDiv("message-header");
+    const headerStrong = headerDiv.createEl("strong");
+    headerStrong.textContent = `${roleIcon} ${roleText}`;
+    const headerSmall = headerDiv.createEl("small");
+    headerSmall.textContent = message.timestamp.toLocaleTimeString("ru-RU");
+    const contentDiv = messageEl.createDiv("message-content");
+    contentDiv.textContent = content;
     this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
   async saveChat() {
     if (this.conversation.length === 0) {
-      new import_obsidian.Notice("\u041D\u0435\u0442 \u0441\u043E\u043E\u0431\u0449\u0435\u043D\u0438\u0439 \u0434\u043B\u044F \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F");
+      new import_obsidian.Notice(this.plugin.t("noMessages"));
       return;
     }
     const title = `\u0427\u0430\u0442 \u0441 ${this.plugin.currentModel}`;
@@ -304,34 +582,44 @@ var QuickQuestionModal = class extends import_obsidian.Modal {
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
-    contentEl.createEl("h2", { text: "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441 \u0418\u0418" });
+    contentEl.createEl("h2", { text: this.plugin.t("quickQuestionTitle") });
     const modelContainer = contentEl.createDiv();
-    modelContainer.createEl("label", { text: "\u041C\u043E\u0434\u0435\u043B\u044C: " });
+    modelContainer.createEl("label", { text: this.plugin.t("model") + ":" });
     this.modelSelect = new import_obsidian.DropdownComponent(modelContainer);
-    this.plugin.models.forEach((model) => {
-      this.modelSelect.addOption(model.name, `${model.name} - ${model.description}`);
+    const modelsToShow = this.plugin.settings.showFreeModelsOnly ? this.plugin.models.filter((m) => this.plugin.isModelFree(m.name)) : this.plugin.models;
+    const categories = /* @__PURE__ */ new Map();
+    modelsToShow.forEach((model) => {
+      const category = this.plugin.getCategoryForModel(model.name);
+      if (!categories.has(category)) {
+        categories.set(category, []);
+      }
+      categories.get(category).push(model);
+    });
+    categories.forEach((models, category) => {
+      models.forEach((model) => {
+        this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
+      });
     });
     this.modelSelect.setValue(this.plugin.currentModel);
     const inputContainer = contentEl.createDiv();
-    inputContainer.createEl("label", { text: "\u0412\u0430\u0448 \u0432\u043E\u043F\u0440\u043E\u0441:" });
+    inputContainer.createEl("label", { text: this.plugin.t("yourQuestion") + ":" });
     this.inputElement = new import_obsidian.TextComponent(inputContainer);
-    this.inputElement.inputEl.placeholder = "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0432\u0430\u0448 \u0432\u043E\u043F\u0440\u043E\u0441...";
-    this.inputElement.inputEl.style.width = "100%";
-    this.inputElement.inputEl.style.height = "100px";
+    this.inputElement.inputEl.placeholder = this.plugin.t("enterQuestion");
+    this.inputElement.inputEl.addClass("input-full");
+    this.inputElement.inputEl.addClass("input-tall");
     const buttonContainer = contentEl.createDiv();
-    buttonContainer.style.marginTop = "10px";
     const askButton = new import_obsidian.ButtonComponent(buttonContainer);
-    askButton.setButtonText("\u0421\u043F\u0440\u043E\u0441\u0438\u0442\u044C");
+    askButton.setButtonText(this.plugin.t("ask"));
     askButton.setCta();
     askButton.onClick(() => this.askQuestion());
     const cancelButton = new import_obsidian.ButtonComponent(buttonContainer);
-    cancelButton.setButtonText("\u041E\u0442\u043C\u0435\u043D\u0430");
+    cancelButton.setButtonText(this.plugin.t("cancel"));
     cancelButton.onClick(() => this.close());
   }
   async askQuestion() {
     const question = this.inputElement.getValue().trim();
     if (!question) {
-      new import_obsidian.Notice("\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0432\u043E\u043F\u0440\u043E\u0441");
+      new import_obsidian.Notice(this.plugin.t("enterQuestionMsg"));
       return;
     }
     const selectedModel = this.modelSelect.getValue();
@@ -345,8 +633,8 @@ var QuickQuestionModal = class extends import_obsidian.Modal {
       if (response.choices && response.choices[0] && response.choices[0].message) {
         const answer = response.choices[0].message.content;
         const conversation = [
-          { role: "user", content: question, timestamp: new Date() },
-          { role: "assistant", content: answer, timestamp: new Date() }
+          { role: "user", content: question, timestamp: /* @__PURE__ */ new Date() },
+          { role: "assistant", content: answer, timestamp: /* @__PURE__ */ new Date() }
         ];
         await this.plugin.saveConversationToNote(conversation, "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441");
         new import_obsidian.Notice("\u041E\u0442\u0432\u0435\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0443");
@@ -363,6 +651,107 @@ var QuickQuestionModal = class extends import_obsidian.Modal {
     contentEl.empty();
   }
 };
+var ImageGenerationModal = class extends import_obsidian.Modal {
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.createEl("h2", { text: this.plugin.t("imageGenerationTitle") });
+    const imageModels = [
+      { id: "zimage", name: this.plugin.t("imageModelZimage") },
+      { id: "flux", name: this.plugin.t("imageModelFlux") },
+      { id: "turbo", name: this.plugin.t("imageModelTurbo") },
+      { id: "gptimage", name: this.plugin.t("imageModelGPT") },
+      { id: "kontext", name: this.plugin.t("imageModelKontext") },
+      { id: "seedream", name: this.plugin.t("imageModelSeeDream") },
+      { id: "nanobanana", name: this.plugin.t("imageModelNanobanana") }
+    ];
+    const modelContainer = contentEl.createDiv();
+    modelContainer.createEl("label", { text: this.plugin.t("model") + ":" });
+    this.modelSelect = new import_obsidian.DropdownComponent(modelContainer);
+    imageModels.forEach((model) => {
+      this.modelSelect.addOption(model.id, model.name);
+    });
+    this.modelSelect.setValue(this.plugin.settings.defaultImageModel);
+    const promptContainer = contentEl.createDiv();
+    promptContainer.createEl("label", { text: this.plugin.t("prompt") + ":" });
+    this.promptInput = new import_obsidian.TextComponent(promptContainer);
+    this.promptInput.inputEl.placeholder = this.plugin.t("enterPrompt");
+    this.promptInput.inputEl.addClass("input-full");
+    this.promptInput.inputEl.addClass("input-tall");
+    const sizeContainer = contentEl.createDiv();
+    sizeContainer.createEl("label", { text: this.plugin.t("size") + ":" });
+    const sizeInputContainer = sizeContainer.createDiv();
+    sizeInputContainer.setCssProps({
+      "display": "flex",
+      "gap": "10px",
+      "align-items": "center",
+      "margin-top": "5px"
+    });
+    this.widthInput = new import_obsidian.TextComponent(sizeInputContainer);
+    this.widthInput.setValue("1024");
+    this.widthInput.inputEl.setCssProps({ "width": "80px" });
+    sizeInputContainer.createSpan({ text: "\xD7" });
+    this.heightInput = new import_obsidian.TextComponent(sizeInputContainer);
+    this.heightInput.setValue("1024");
+    this.heightInput.inputEl.setCssProps({ "width": "80px" });
+    const buttonContainer = contentEl.createDiv();
+    const generateButton = new import_obsidian.ButtonComponent(buttonContainer);
+    generateButton.setButtonText(this.plugin.t("generate"));
+    generateButton.setCta();
+    generateButton.onClick(() => this.generateImage());
+    const cancelButton = new import_obsidian.ButtonComponent(buttonContainer);
+    cancelButton.setButtonText(this.plugin.t("cancel"));
+    cancelButton.onClick(() => this.close());
+  }
+  async generateImage() {
+    var _a;
+    const prompt = this.promptInput.getValue().trim();
+    if (!prompt) {
+      new import_obsidian.Notice(this.plugin.t("enterPromptMsg"));
+      return;
+    }
+    const model = this.modelSelect.getValue();
+    const width = parseInt(this.widthInput.getValue()) || 1024;
+    const height = parseInt(this.heightInput.getValue()) || 1024;
+    const loadingNotice = new import_obsidian.Notice(this.plugin.t("generating"), 0);
+    try {
+      const result = await this.plugin.generateImage(prompt, model, width, height);
+      loadingNotice.hide();
+      if (result.error) {
+        new import_obsidian.Notice(`Error: ${result.error}`);
+        return;
+      }
+      if (result.imageData && result.filename) {
+        const filePath = await this.plugin.saveImage(result.imageData, result.filename);
+        if (filePath) {
+          new import_obsidian.Notice(`Image saved: ${filePath}`);
+          const activeFile = this.app.workspace.getActiveFile();
+          if (activeFile) {
+            const editor = (_a = this.app.workspace.activeEditor) == null ? void 0 : _a.editor;
+            if (editor) {
+              editor.replaceSelection(`![[${filePath}]]
+`);
+            }
+          }
+          this.close();
+        } else {
+          new import_obsidian.Notice("Failed to save image");
+        }
+      }
+    } catch (error) {
+      loadingNotice.hide();
+      new import_obsidian.Notice(`Error: ${error}`);
+    }
+  }
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+};
 var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -371,10 +760,36 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
-    containerEl.createEl("h2", { text: "\u041D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0438 Pollinations AI" });
-    new import_obsidian.Setting(containerEl).setName("\u041C\u043E\u0434\u0435\u043B\u044C \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E").setDesc("\u0412\u044B\u0431\u0435\u0440\u0438\u0442\u0435 \u043C\u043E\u0434\u0435\u043B\u044C \u0418\u0418 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E").addDropdown((dropdown) => {
-      this.plugin.models.forEach((model) => {
-        dropdown.addOption(model.name, `${model.name} - ${model.description}`);
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("settingsTitle")).setHeading();
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("language")).setDesc(this.plugin.t("languageDesc")).addDropdown((dropdown) => {
+      dropdown.addOption("en", "English");
+      dropdown.addOption("ru", "\u0420\u0443\u0441\u0441\u043A\u0438\u0439");
+      dropdown.setValue(this.plugin.settings.language);
+      dropdown.onChange(async (value) => {
+        this.plugin.settings.language = value;
+        await this.plugin.saveSettings();
+        this.display();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("showFreeModelsOnly")).setDesc(this.plugin.t("showFreeModelsOnlyDesc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.showFreeModelsOnly).onChange(async (value) => {
+      this.plugin.settings.showFreeModelsOnly = value;
+      await this.plugin.saveSettings();
+      this.display();
+    }));
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("defaultModel")).setDesc(this.plugin.t("defaultModelDesc")).addDropdown((dropdown) => {
+      const modelsToShow = this.plugin.settings.showFreeModelsOnly ? this.plugin.models.filter((m) => this.plugin.isModelFree(m.name)) : this.plugin.models;
+      const categories = /* @__PURE__ */ new Map();
+      modelsToShow.forEach((model) => {
+        const category = this.plugin.getCategoryForModel(model.name);
+        if (!categories.has(category)) {
+          categories.set(category, []);
+        }
+        categories.get(category).push(model);
+      });
+      categories.forEach((models, category) => {
+        models.forEach((model) => {
+          dropdown.addOption(model.name, `[${category}] ${model.name}`);
+        });
       });
       dropdown.setValue(this.plugin.settings.defaultModel);
       dropdown.onChange(async (value) => {
@@ -383,18 +798,35 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       });
     });
-    new import_obsidian.Setting(containerEl).setName("\u0421\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C \u0447\u0430\u0442\u044B \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0438").setDesc("\u0410\u0432\u0442\u043E\u043C\u0430\u0442\u0438\u0447\u0435\u0441\u043A\u0438 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C \u0440\u0430\u0437\u0433\u043E\u0432\u043E\u0440\u044B \u0441 \u0418\u0418 \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0438").addToggle((toggle) => toggle.setValue(this.plugin.settings.saveToNotes).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("saveChatsToNotes")).setDesc(this.plugin.t("saveChatsDesc")).addToggle((toggle) => toggle.setValue(this.plugin.settings.saveToNotes).onChange(async (value) => {
       this.plugin.settings.saveToNotes = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("\u041F\u0430\u043F\u043A\u0430 \u0434\u043B\u044F \u0437\u0430\u043C\u0435\u0442\u043E\u043A").setDesc("\u041F\u0430\u043F\u043A\u0430, \u043A\u0443\u0434\u0430 \u0431\u0443\u0434\u0443\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C\u0441\u044F \u0447\u0430\u0442\u044B \u0441 \u0418\u0418").addText((text) => text.setPlaceholder("AI \u0427\u0430\u0442\u044B").setValue(this.plugin.settings.notesFolder).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("notesFolder")).setDesc(this.plugin.t("notesFolderDesc")).addText((text) => text.setPlaceholder("AI Chats").setValue(this.plugin.settings.notesFolder).onChange(async (value) => {
       this.plugin.settings.notesFolder = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName("API \u0442\u043E\u043A\u0435\u043D").setDesc("\u0422\u043E\u043A\u0435\u043D \u0434\u043B\u044F \u0434\u043E\u0441\u0442\u0443\u043F\u0430 \u043A API (\u0435\u0441\u043B\u0438 \u0442\u0440\u0435\u0431\u0443\u0435\u0442\u0441\u044F)").addText((text) => text.setPlaceholder("\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0442\u043E\u043A\u0435\u043D...").setValue(this.plugin.settings.apiToken).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("apiToken")).setDesc(this.plugin.t("apiTokenDesc")).addText((text) => text.setPlaceholder(this.plugin.t("enterToken")).setValue(this.plugin.settings.apiToken).onChange(async (value) => {
       this.plugin.settings.apiToken = value;
       await this.plugin.saveSettings();
     }));
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("imagesFolder")).setDesc(this.plugin.t("imagesFolderDesc")).addText((text) => text.setPlaceholder("AI Images").setValue(this.plugin.settings.imagesFolder).onChange(async (value) => {
+      this.plugin.settings.imagesFolder = value;
+      await this.plugin.saveSettings();
+    }));
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("defaultImageModel")).setDesc(this.plugin.t("defaultImageModelDesc")).addDropdown((dropdown) => {
+      dropdown.addOption("zimage", this.plugin.t("imageModelZimage"));
+      dropdown.addOption("flux", this.plugin.t("imageModelFlux"));
+      dropdown.addOption("turbo", this.plugin.t("imageModelTurbo"));
+      dropdown.addOption("gptimage", this.plugin.t("imageModelGPT"));
+      dropdown.addOption("kontext", this.plugin.t("imageModelKontext"));
+      dropdown.addOption("seedream", this.plugin.t("imageModelSeeDream"));
+      dropdown.addOption("nanobanana", this.plugin.t("imageModelNanobanana"));
+      dropdown.setValue(this.plugin.settings.defaultImageModel);
+      dropdown.onChange(async (value) => {
+        this.plugin.settings.defaultImageModel = value;
+        await this.plugin.saveSettings();
+      });
+    });
   }
 };
-

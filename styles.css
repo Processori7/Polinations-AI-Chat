@@ -5,6 +5,11 @@
     background: var(--background-primary);
     border-radius: 8px;
     margin: 10px 0;
+    height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--background-modifier-border);
+    padding: 10px;
+    margin-bottom: 10px;
 }
 
 /* Сообщения в чате */
@@ -83,6 +88,18 @@
     color: var(--text-normal);
 }
 
+.input-wide {
+    width: 70%;
+}
+
+.input-full {
+    width: 100%;
+}
+
+.input-tall {
+    height: 100px;
+}
+
 .input-container input:focus {
     outline: none;
     border-color: var(--interactive-accent);
@@ -95,6 +112,7 @@
     gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
+    margin-top: 10px;
 }
 
 .button-container button {

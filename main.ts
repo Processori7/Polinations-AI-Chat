@@ -1,18 +1,193 @@
-import { App, Plugin, PluginSettingTab, Setting, TFile, Notice, Modal, TextComponent, ButtonComponent, DropdownComponent, MarkdownView } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, Notice, Modal, TextComponent, ButtonComponent, DropdownComponent, requestUrl } from 'obsidian';
 
 interface PollinationsAISettings {
 	defaultModel: string;
 	saveToNotes: boolean;
 	notesFolder: string;
 	apiToken: string;
+	imagesFolder: string;
+	defaultImageModel: string;
+	language: 'en' | 'ru';
+	showFreeModelsOnly: boolean;
 }
 
 const DEFAULT_SETTINGS: PollinationsAISettings = {
 	defaultModel: 'openai',
 	saveToNotes: true,
-	notesFolder: 'Чаты с ИИ',
-	apiToken: ''
+	notesFolder: 'AI Chats',
+	apiToken: '',
+	imagesFolder: 'AI Images',
+	defaultImageModel: 'zimage',
+	language: 'en',
+	showFreeModelsOnly: false
 }
+
+const TRANSLATIONS = {
+	en: {
+		// Commands
+		openAIChat: 'Open AI chat',
+		quickAIQuestion: 'Quick AI question',
+		generateAIImage: 'Generate AI image',
+		aiChat: 'AI chat',
+		
+		// Modal titles
+		aiChatTitle: 'AI chat',
+		quickQuestionTitle: 'Quick AI question',
+		imageGenerationTitle: 'Generate AI image',
+		
+		// Labels
+		model: 'Model',
+		prompt: 'Prompt',
+		size: 'Size',
+		yourQuestion: 'Your question',
+		
+		// Placeholders
+		enterQuestion: 'Enter your question...',
+		enterPrompt: 'Describe the image you want to generate...',
+		enterToken: 'Enter token...',
+		
+		// Buttons
+		send: 'Send',
+		saveChat: 'Save chat',
+		clear: 'Clear',
+		ask: 'Ask',
+		cancel: 'Cancel',
+		generate: 'Generate',
+		
+		// Messages
+		thinking: 'Thinking...',
+		noMessages: 'No messages to save',
+		enterQuestionMsg: 'Enter a question',
+		enterPromptMsg: 'Enter a prompt',
+		chatSaved: 'Chat saved to',
+		saveError: 'Save error',
+		imageSaved: 'Image saved',
+		imageError: 'Failed to save image',
+		generating: 'Generating image...',
+		answerSaved: 'Answer saved to note',
+		unexpectedResponse: 'Unexpected API response',
+		error: 'Error',
+		
+		// User/AI labels
+		user: 'You',
+		ai: 'AI',
+		
+		// Settings
+		settingsTitle: 'Pollinations AI settings',
+		defaultModel: 'Default model',
+		defaultModelDesc: 'Select default AI model',
+		saveChatsToNotes: 'Save chats to notes',
+		saveChatsDesc: 'Automatically save AI conversations to notes',
+		notesFolder: 'Notes folder',
+		notesFolderDesc: 'Folder where AI chats will be saved',
+		apiToken: 'API token',
+		apiTokenDesc: 'Access token for API (optional)',
+		imagesFolder: 'Images folder',
+		imagesFolderDesc: 'Folder where generated images will be saved',
+		defaultImageModel: 'Default image model',
+		defaultImageModelDesc: 'Default model for image generation',
+		language: 'Language',
+		languageDesc: 'Interface language',
+		showFreeModelsOnly: 'Show only free models',
+		showFreeModelsOnlyDesc: 'Show only models that work without API key',
+		
+		// Model categories
+		categoryText: 'Text',
+		categoryImages: 'Images',
+		categoryAudio: 'Audio',
+		
+		// Image models
+		imageModelZimage: 'Zimage (Default)',
+		imageModelFlux: 'Flux',
+		imageModelTurbo: 'Turbo (Fast)',
+		imageModelGPT: 'GPT Image',
+		imageModelKontext: 'Kontext',
+		imageModelSeeDream: 'SeeDream',
+		imageModelNanobanana: 'Nanobanana'
+	},
+	ru: {
+		// Commands
+		openAIChat: 'Открыть ИИ чат',
+		quickAIQuestion: 'Быстрый вопрос ИИ',
+		generateAIImage: 'Генерировать ИИ изображение',
+		aiChat: 'ИИ чат',
+		
+		// Modal titles
+		aiChatTitle: 'ИИ чат',
+		quickQuestionTitle: 'Быстрый вопрос ИИ',
+		imageGenerationTitle: 'Генерация ИИ изображения',
+		
+		// Labels
+		model: 'Модель',
+		prompt: 'Промпт',
+		size: 'Размер',
+		yourQuestion: 'Ваш вопрос',
+		
+		// Placeholders
+		enterQuestion: 'Введите ваш вопрос...',
+		enterPrompt: 'Опишите изображение, которое хотите сгенерировать...',
+		enterToken: 'Введите токен...',
+		
+		// Buttons
+		send: 'Отправить',
+		saveChat: 'Сохранить чат',
+		clear: 'Очистить',
+		ask: 'Спросить',
+		cancel: 'Отмена',
+		generate: 'Генерировать',
+		
+		// Messages
+		thinking: 'Думаю...',
+		noMessages: 'Нет сообщений для сохранения',
+		enterQuestionMsg: 'Введите вопрос',
+		enterPromptMsg: 'Введите промпт',
+		chatSaved: 'Чат сохранен в',
+		saveError: 'Ошибка сохранения',
+		imageSaved: 'Изображение сохранено',
+		imageError: 'Не удалось сохранить изображение',
+		generating: 'Генерация изображения...',
+		answerSaved: 'Ответ сохранен в заметку',
+		unexpectedResponse: 'Получен неожиданный ответ от API',
+		error: 'Ошибка',
+		
+		// User/AI labels
+		user: 'Вы',
+		ai: 'ИИ',
+		
+		// Settings
+		settingsTitle: 'Настройки Pollinations AI',
+		defaultModel: 'Модель по умолчанию',
+		defaultModelDesc: 'Выберите модель ИИ по умолчанию',
+		saveChatsToNotes: 'Сохранять чаты в заметки',
+		saveChatsDesc: 'Автоматически сохранять разговоры с ИИ в заметки',
+		notesFolder: 'Папка для заметок',
+		notesFolderDesc: 'Папка, куда будут сохраняться чаты с ИИ',
+		apiToken: 'API токен',
+		apiTokenDesc: 'Токен для доступа к API (опционально)',
+		imagesFolder: 'Папка для изображений',
+		imagesFolderDesc: 'Папка, куда будут сохраняться сгенерированные изображения',
+		defaultImageModel: 'Модель изображений по умолчанию',
+		defaultImageModelDesc: 'Модель для генерации изображений по умолчанию',
+		language: 'Язык',
+		languageDesc: 'Язык интерфейса',
+		showFreeModelsOnly: 'Показывать только бесплатные модели',
+		showFreeModelsOnlyDesc: 'Показывать только модели, работающие без API ключа',
+		
+		// Model categories
+		categoryText: 'Текст',
+		categoryImages: 'Картинки',
+		categoryAudio: 'Аудио',
+		
+		// Image models
+		imageModelZimage: 'Zimage (по умолчанию)',
+		imageModelFlux: 'Flux',
+		imageModelTurbo: 'Turbo (быстрая)',
+		imageModelGPT: 'GPT Image',
+		imageModelKontext: 'Kontext',
+		imageModelSeeDream: 'SeeDream',
+		imageModelNanobanana: 'Nanobanana'
+	}
+};
 
 interface AIModel {
 	name: string;
@@ -31,6 +206,39 @@ export default class PollinationsAIPlugin extends Plugin {
 	models: AIModel[] = [];
 	currentModel: string;
 
+	t(key: keyof typeof TRANSLATIONS.en): string {
+		return TRANSLATIONS[this.settings.language][key];
+	}
+
+	getCategoryForModel(modelName: string): string {
+		const name = modelName.toLowerCase();
+		// Image generation models
+		if (name.includes('flux') || name === 'turbo' || name === 'gptimage' || 
+		    name === 'kontext' || name.includes('seedream') || name.includes('nanobanana') ||
+		    name === 'zimage' || name === 'veo' || name.includes('seedance')) {
+			return this.t('categoryImages');
+		}
+		// Audio models (music, speech, etc.)
+		if (name.includes('audio') || name.includes('tts') || name.includes('speech') ||
+		    name.includes('midijourney')) {
+			return this.t('categoryAudio');
+		}
+		// Default to text models
+		return this.t('categoryText');
+	}
+
+	isModelFree(modelName: string): boolean {
+		const name = modelName.toLowerCase();
+		// Models available in free tier (cheapest models based on pricing)
+		const freeModels = [
+			// Text models (cheapest)
+			'openai', 'openai-fast', 'qwen-coder', 'mistral', 'gemini-fast', 'nova-micro', 'deepseek',
+			// Image models (basic free tier)
+			'flux', 'turbo', 'gptimage', 'kontext', 'seedream', 'nanobanana', 'zimage'
+		];
+		return freeModels.includes(name);
+	}
+
 	async onload() {
 		await this.loadSettings();
 		this.currentModel = this.settings.defaultModel;
@@ -41,7 +249,7 @@ export default class PollinationsAIPlugin extends Plugin {
 		// Добавляем команду для открытия чата
 		this.addCommand({
 			id: 'open-ai-chat',
-			name: 'Открыть ИИ чат',
+			name: this.t('openAIChat'),
 			callback: () => {
 				new AIchatModal(this.app, this).open();
 			}
@@ -50,9 +258,18 @@ export default class PollinationsAIPlugin extends Plugin {
 		// Добавляем команду для быстрого вопроса
 		this.addCommand({
 			id: 'quick-ai-question',
-			name: 'Быстрый вопрос ИИ',
+			name: this.t('quickAIQuestion'),
 			callback: () => {
 				new QuickQuestionModal(this.app, this).open();
+			}
+		});
+
+		// Добавляем команду для генерации изображений
+		this.addCommand({
+			id: 'generate-ai-image',
+			name: this.t('generateAIImage'),
+			callback: () => {
+				new ImageGenerationModal(this.app, this).open();
 			}
 		});
 
@@ -60,93 +277,121 @@ export default class PollinationsAIPlugin extends Plugin {
 		this.addSettingTab(new PollinationsAISettingTab(this.app, this));
 
 		// Добавляем иконку в левую панель
-		this.addRibbonIcon('message-circle', 'ИИ Чат', (evt: MouseEvent) => {
+		this.addRibbonIcon('message-circle', this.t('aiChat'), (evt: MouseEvent) => {
 			new AIchatModal(this.app, this).open();
 		});
 	}
 
-	async loadModels() {
-		try {
-			const response = await fetch('https://text.pollinations.ai/models');
-			if (response.ok) {
-				const models = await response.json();
-				this.models = models.map((model: any) => {
-					let input_modalities = model.input_modalities || [];
-					
-					// Если API не возвращает модальности, определяем их вручную
-					if (!input_modalities.length) {
-						if (model.name.toLowerCase().includes('openai')) {
-							input_modalities = ['text', 'image'];
-						} else if (model.name.toLowerCase().includes('audio')) {
-							input_modalities = ['text', 'audio'];
-						} else {
-							input_modalities = ['text'];
-						}
-					}
+		async loadModels() {
+		// Список моделей по умолчанию на случай проблем с API
+		const defaultModels: AIModel[] = [
+			{ name: 'openai', description: 'OpenAI GPT-5 Mini', input_modalities: ['text'] },
+			{ name: 'mistral', description: 'Mistral Small', input_modalities: ['text'] },
+			{ name: 'gemini-fast', description: 'Gemini Flash Lite', input_modalities: ['text'] },
+			{ name: 'qwen-coder', description: 'Qwen Coder', input_modalities: ['text'] },
+			{ name: 'flux', description: 'Flux Image Generator', input_modalities: ['text'] },
+			{ name: 'turbo', description: 'Turbo Image (Fast)', input_modalities: ['text'] }
+		];
 
-					return {
-						name: model.name,
-						description: model.description || 'Без описания',
-						input_modalities
-					};
-				});
-			} else {
-				// Используем модель по умолчанию если не удалось загрузить список
-				this.models = [{
-					name: 'openai',
-					description: 'OpenAI GPT-4o Mini',
-					input_modalities: ['text']
-				}];
+		try {
+			const headers: Record<string, string> = {};
+			if (this.settings.apiToken) {
+				headers['Authorization'] = `Bearer ${this.settings.apiToken}`;
 			}
+
+			// Load text models
+			const textResponse = await requestUrl({ 
+				url: 'https://gen.pollinations.ai/text/models',
+				method: 'GET',
+				headers,
+				throw: false
+			});
+			
+			// Load image models
+			const imageResponse = await requestUrl({ 
+				url: 'https://gen.pollinations.ai/image/models',
+				method: 'GET',
+				headers,
+				throw: false
+			});
+			
+			console.debug('Text models response:', textResponse);
+			console.debug('Image models response:', imageResponse);
+			
+			const allModels: AIModel[] = [];
+			
+			// Process text models
+			if (textResponse.status === 200 && textResponse.json && Array.isArray(textResponse.json)) {
+				const textModels = textResponse.json
+					.filter((m: any) => !m.is_specialized) // Exclude specialized models (midijourney, chickytutor)
+					.map((model: any) => ({
+						name: model.name,
+						description: model.description || model.name,
+						input_modalities: model.input_modalities || ['text']
+					}));
+				allModels.push(...textModels);
+			}
+			
+			// Process image models
+			if (imageResponse.status === 200 && imageResponse.json && Array.isArray(imageResponse.json)) {
+				const imageModels = imageResponse.json
+					.filter((m: any) => !m.is_specialized)
+					.map((model: any) => ({
+						name: model.name,
+						description: model.description || model.name,
+						input_modalities: model.input_modalities || ['text']
+					}));
+				allModels.push(...imageModels);
+			}
+			
+			if (allModels.length > 0) {
+				this.models = allModels;
+				console.debug('Loaded models:', this.models);
+				return;
+			}
+			
+			console.warn('API response not valid, using default models');
+			this.models = defaultModels;
 		} catch (error) {
-			console.error('Ошибка загрузки моделей:', error);
-			this.models = [{
-				name: 'openai',
-				description: 'OpenAI GPT-4o Mini',
-				input_modalities: ['text']
-			}];
+			console.warn('Не удалось загрузить модели из API, используем список по умолчанию:', error);
+			this.models = defaultModels;
 		}
 	}
 
-	async communicateWithAI(modelName: string, messages: { role: string; content: string }[]): Promise<any> {
+	async communicateWithAI(modelName: string, messages: { role: string; content: string }[]): Promise<{ error?: string; choices?: Array<{ message: { content: string } }> }> {
 		try {
-			// Извлекаем последнее сообщение пользователя для простого API
-			const lastUserMessage = messages.filter(msg => msg.role === 'user').pop();
-			if (!lastUserMessage) {
-				return { error: 'Нет сообщения пользователя' };
+			const headers: Record<string, string> = {
+				'Content-Type': 'application/json'
+			};
+			
+			if (this.settings.apiToken) {
+				headers['Authorization'] = `Bearer ${this.settings.apiToken}`;
 			}
 
-			// Кодируем промпт для URL
-			const encodedPrompt = `'${lastUserMessage.content}'`;
-
-			// Строим URL с параметрами
-			const url = new URL(`https://text.pollinations.ai/${encodedPrompt}`);
-			url.searchParams.set('model', modelName);
-			url.searchParams.set('private', 'true');
-
-			// Логируем для отладки
-			console.log('Pollinations API запрос:', {
-				url: url.toString(),
+			const requestBody = {
 				model: modelName,
-				prompt: lastUserMessage.content
+				messages: messages,
+				private: true
+			};
+
+			console.debug('Pollinations API запрос:', {
+				url: 'https://gen.pollinations.ai/v1/chat/completions',
+				model: modelName,
+				messages: messages
 			});
 
-			const response = await fetch(url.toString(), {
-				method: 'GET'
+			const response = await requestUrl({
+				url: 'https://gen.pollinations.ai/v1/chat/completions',
+				method: 'POST',
+				headers,
+				body: JSON.stringify(requestBody),
+				throw: false
 			});
 
-			if (response.ok) {
-				const text = await response.text();
-				// Возвращаем в формате, совместимом с OpenAI API
-				return {
-					choices: [{
-						message: {
-							content: text
-						}
-					}]
-				};
+			if (response.status === 200 && response.json) {
+				return response.json;
 			} else {
-				return { error: `HTTP ${response.status}: ${response.statusText}` };
+				return { error: `HTTP ${response.status}` };
 			}
 		} catch (error) {
 			return { error: error.toString() };
@@ -199,6 +444,64 @@ export default class PollinationsAIPlugin extends Plugin {
 	async saveSettings() {
 		await this.saveData(this.settings);
 	}
+
+	async generateImage(prompt: string, model: string = 'zimage', width: number = 1024, height: number = 1024): Promise<{ error?: string; imageData?: ArrayBuffer; filename?: string }> {
+		try {
+			// Image generation requires API key
+			if (!this.settings.apiToken) {
+				return { error: 'API key required for image generation. Please add it in settings.' };
+			}
+			
+			const url = new URL(`https://gen.pollinations.ai/image/${encodeURIComponent(prompt)}`);
+			url.searchParams.set('model', model);
+			url.searchParams.set('width', width.toString());
+			url.searchParams.set('height', height.toString());
+			url.searchParams.set('nologo', 'true');
+			url.searchParams.set('private', 'true');
+			url.searchParams.set('key', this.settings.apiToken);
+
+			const response = await requestUrl({
+				url: url.toString(),
+				method: 'GET',
+				throw: false
+			});
+
+			if (response.status === 200 && response.arrayBuffer) {
+				const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+				const filename = `ai-image-${timestamp}.png`;
+				return { 
+					imageData: response.arrayBuffer,
+					filename
+				};
+			} else {
+				const errorText = response.text || response.json ? JSON.stringify(response.json) : 'Unknown error';
+				return { error: `HTTP ${response.status}: ${errorText}` };
+			}
+		} catch (error) {
+			return { error: error.toString() };
+		}
+	}
+
+	async saveImage(imageData: ArrayBuffer, filename: string): Promise<string | null> {
+		try {
+			const folderPath = this.settings.imagesFolder;
+			
+			// Создаем папку если её нет
+			if (!this.app.vault.getAbstractFileByPath(folderPath)) {
+				await this.app.vault.createFolder(folderPath);
+			}
+
+			const filePath = `${folderPath}/${filename}`;
+			
+			// Сохраняем изображение
+			await this.app.vault.createBinary(filePath, imageData);
+			
+			return filePath;
+		} catch (error) {
+			console.error('Error saving image:', error);
+			return null;
+		}
+	}
 }
 
 class AIchatModal extends Modal {
@@ -217,16 +520,36 @@ class AIchatModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		contentEl.createEl('h2', { text: 'ИИ Чат' });
+		contentEl.createEl('h2', { text: this.plugin.t('aiChatTitle') });
 
 		// Выбор модели
 		const modelContainer = contentEl.createDiv('model-selector');
-		modelContainer.createEl('label', { text: 'Модель: ' });
+		modelContainer.createEl('label', { text: this.plugin.t('model') + ':' });
 		
 		this.modelSelect = new DropdownComponent(modelContainer);
-		this.plugin.models.forEach(model => {
-			this.modelSelect.addOption(model.name, `${model.name} - ${model.description}`);
+		
+		// Filter models based on showFreeModelsOnly setting
+		const modelsToShow = this.plugin.settings.showFreeModelsOnly 
+			? this.plugin.models.filter(m => this.plugin.isModelFree(m.name))
+			: this.plugin.models;
+		
+		// Group models by category
+		const categories = new Map<string, AIModel[]>();
+		modelsToShow.forEach(model => {
+			const category = this.plugin.getCategoryForModel(model.name);
+			if (!categories.has(category)) {
+				categories.set(category, []);
+			}
+			categories.get(category)!.push(model);
 		});
+		
+		// Add models by category
+		categories.forEach((models, category) => {
+			models.forEach(model => {
+				this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
+			});
+		});
+		
 		this.modelSelect.setValue(this.plugin.currentModel);
 		this.modelSelect.onChange((value) => {
 			this.plugin.currentModel = value;
@@ -234,17 +557,12 @@ class AIchatModal extends Modal {
 
 		// Контейнер для чата
 		this.chatContainer = contentEl.createDiv('chat-container');
-		this.chatContainer.style.height = '400px';
-		this.chatContainer.style.overflowY = 'auto';
-		this.chatContainer.style.border = '1px solid var(--background-modifier-border)';
-		this.chatContainer.style.padding = '10px';
-		this.chatContainer.style.marginBottom = '10px';
 
 		// Поле ввода
 		const inputContainer = contentEl.createDiv('input-container');
 		this.inputElement = new TextComponent(inputContainer);
-		this.inputElement.inputEl.placeholder = 'Введите ваш вопрос...';
-		this.inputElement.inputEl.style.width = '70%';
+		this.inputElement.inputEl.placeholder = this.plugin.t('enterQuestion');
+		this.inputElement.inputEl.addClass('input-wide');
 		this.inputElement.inputEl.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter' && !e.shiftKey) {
 				e.preventDefault();
@@ -254,19 +572,18 @@ class AIchatModal extends Modal {
 
 		// Кнопка отправки
 		const sendButton = new ButtonComponent(inputContainer);
-		sendButton.setButtonText('Отправить');
+		sendButton.setButtonText(this.plugin.t('send'));
 		sendButton.onClick(() => this.sendMessage());
 
 		// Кнопки управления
 		const buttonContainer = contentEl.createDiv('button-container');
-		buttonContainer.style.marginTop = '10px';
 
 		const saveButton = new ButtonComponent(buttonContainer);
-		saveButton.setButtonText('Сохранить чат');
+		saveButton.setButtonText(this.plugin.t('saveChat'));
 		saveButton.onClick(() => this.saveChat());
 
 		const clearButton = new ButtonComponent(buttonContainer);
-		clearButton.setButtonText('Очистить');
+		clearButton.setButtonText(this.plugin.t('clear'));
 		clearButton.onClick(() => this.clearChat());
 	}
 
@@ -278,31 +595,53 @@ class AIchatModal extends Modal {
 		this.addMessage('user', message);
 		this.inputElement.setValue('');
 
+		// Проверяем, является ли модель моделью изображений
+		const isImageModel = this.plugin.getCategoryForModel(this.plugin.currentModel) === this.plugin.t('categoryImages');
+
 		// Показываем индикатор загрузки
 		const loadingEl = this.chatContainer.createDiv('loading-message');
-		loadingEl.textContent = '🤖 Думаю...';
+		loadingEl.textContent = '🤖 ' + this.plugin.t('thinking');
 
 		try {
-			const messages = this.conversation.map(msg => ({
-				role: msg.role,
-				content: msg.content
-			}));
+			if (isImageModel) {
+				// Генерация изображения
+				const result = await this.plugin.generateImage(message, this.plugin.currentModel, 1024, 1024);
+				
+				loadingEl.remove();
 
-			const response = await this.plugin.communicateWithAI(this.plugin.currentModel, messages);
-			
-			// Удаляем индикатор загрузки
-			loadingEl.remove();
-
-			if (response.error) {
-				this.addMessage('assistant', `Ошибка: ${response.error}`);
-			} else if (response.choices && response.choices[0] && response.choices[0].message) {
-				this.addMessage('assistant', response.choices[0].message.content);
+				if (result.error) {
+					this.addMessage('assistant', `${this.plugin.t('error')}: ${result.error}`);
+				} else if (result.imageData && result.filename) {
+					const filePath = await this.plugin.saveImage(result.imageData, result.filename);
+					
+					if (filePath) {
+						this.addMessage('assistant', `${this.plugin.t('imageSaved')}: [[${filePath}]]`);
+					} else {
+						this.addMessage('assistant', this.plugin.t('imageError'));
+					}
+				}
 			} else {
-				this.addMessage('assistant', 'Получен неожиданный ответ от API');
+				// Текстовый чат
+				const messages = this.conversation.map(msg => ({
+					role: msg.role,
+					content: msg.content
+				}));
+
+				const response = await this.plugin.communicateWithAI(this.plugin.currentModel, messages);
+				
+				loadingEl.remove();
+
+				if (response.error) {
+					this.addMessage('assistant', `${this.plugin.t('error')}: ${response.error}`);
+				} else if (response.choices && response.choices[0] && response.choices[0].message) {
+					this.addMessage('assistant', response.choices[0].message.content);
+				} else {
+					this.addMessage('assistant', this.plugin.t('unexpectedResponse'));
+				}
 			}
 		} catch (error) {
 			loadingEl.remove();
-			this.addMessage('assistant', `Ошибка: ${error}`);
+			this.addMessage('assistant', `${this.plugin.t('error')}: ${error}`);
 		}
 	}
 
@@ -318,22 +657,23 @@ class AIchatModal extends Modal {
 		messageEl.addClass(role === 'user' ? 'user-message' : 'assistant-message');
 		
 		const roleIcon = role === 'user' ? '👤' : '🤖';
-		const roleText = role === 'user' ? 'Вы' : 'ИИ';
+		const roleText = role === 'user' ? this.plugin.t('user') : this.plugin.t('ai');
 		
-		messageEl.innerHTML = `
-			<div class="message-header">
-				<strong>${roleIcon} ${roleText}</strong>
-				<small>${message.timestamp.toLocaleTimeString('ru-RU')}</small>
-			</div>
-			<div class="message-content">${content}</div>
-		`;
+		const headerDiv = messageEl.createDiv('message-header');
+		const headerStrong = headerDiv.createEl('strong');
+		headerStrong.textContent = `${roleIcon} ${roleText}`;
+		const headerSmall = headerDiv.createEl('small');
+		headerSmall.textContent = message.timestamp.toLocaleTimeString('ru-RU');
+		
+		const contentDiv = messageEl.createDiv('message-content');
+		contentDiv.textContent = content;
 
 		this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
 	}
 
 	async saveChat() {
 		if (this.conversation.length === 0) {
-			new Notice('Нет сообщений для сохранения');
+			new Notice(this.plugin.t('noMessages'));
 			return;
 		}
 
@@ -366,44 +706,62 @@ class QuickQuestionModal extends Modal {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		contentEl.createEl('h2', { text: 'Быстрый вопрос ИИ' });
+		contentEl.createEl('h2', { text: this.plugin.t('quickQuestionTitle') });
 
 		// Выбор модели
 		const modelContainer = contentEl.createDiv();
-		modelContainer.createEl('label', { text: 'Модель: ' });
+		modelContainer.createEl('label', { text: this.plugin.t('model') + ':' });
 		
 		this.modelSelect = new DropdownComponent(modelContainer);
-		this.plugin.models.forEach(model => {
-			this.modelSelect.addOption(model.name, `${model.name} - ${model.description}`);
+		
+		// Filter models based on showFreeModelsOnly setting
+		const modelsToShow = this.plugin.settings.showFreeModelsOnly 
+			? this.plugin.models.filter(m => this.plugin.isModelFree(m.name))
+			: this.plugin.models;
+		
+		// Group models by category
+		const categories = new Map<string, AIModel[]>();
+		modelsToShow.forEach(model => {
+			const category = this.plugin.getCategoryForModel(model.name);
+			if (!categories.has(category)) {
+				categories.set(category, []);
+			}
+			categories.get(category)!.push(model);
 		});
+		
+		categories.forEach((models, category) => {
+			models.forEach(model => {
+				this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
+			});
+		});
+		
 		this.modelSelect.setValue(this.plugin.currentModel);
 
 		// Поле ввода
 		const inputContainer = contentEl.createDiv();
-		inputContainer.createEl('label', { text: 'Ваш вопрос:' });
+		inputContainer.createEl('label', { text: this.plugin.t('yourQuestion') + ':' });
 		this.inputElement = new TextComponent(inputContainer);
-		this.inputElement.inputEl.placeholder = 'Введите ваш вопрос...';
-		this.inputElement.inputEl.style.width = '100%';
-		this.inputElement.inputEl.style.height = '100px';
+		this.inputElement.inputEl.placeholder = this.plugin.t('enterQuestion');
+		this.inputElement.inputEl.addClass('input-full');
+		this.inputElement.inputEl.addClass('input-tall');
 
 		// Кнопки
 		const buttonContainer = contentEl.createDiv();
-		buttonContainer.style.marginTop = '10px';
 
 		const askButton = new ButtonComponent(buttonContainer);
-		askButton.setButtonText('Спросить');
+		askButton.setButtonText(this.plugin.t('ask'));
 		askButton.setCta();
 		askButton.onClick(() => this.askQuestion());
 
 		const cancelButton = new ButtonComponent(buttonContainer);
-		cancelButton.setButtonText('Отмена');
+		cancelButton.setButtonText(this.plugin.t('cancel'));
 		cancelButton.onClick(() => this.close());
 	}
 
 	async askQuestion() {
 		const question = this.inputElement.getValue().trim();
 		if (!question) {
-			new Notice('Введите вопрос');
+			new Notice(this.plugin.t('enterQuestionMsg'));
 			return;
 		}
 
@@ -444,6 +802,143 @@ class QuickQuestionModal extends Modal {
 	}
 }
 
+class ImageGenerationModal extends Modal {
+	plugin: PollinationsAIPlugin;
+	promptInput: TextComponent;
+	modelSelect: DropdownComponent;
+	widthInput: TextComponent;
+	heightInput: TextComponent;
+
+	constructor(app: App, plugin: PollinationsAIPlugin) {
+		super(app);
+		this.plugin = plugin;
+	}
+
+	onOpen() {
+		const { contentEl } = this;
+		contentEl.empty();
+
+		contentEl.createEl('h2', { text: this.plugin.t('imageGenerationTitle') });
+
+		// Image models
+		const imageModels = [
+			{ id: 'zimage', name: this.plugin.t('imageModelZimage') },
+			{ id: 'flux', name: this.plugin.t('imageModelFlux') },
+			{ id: 'turbo', name: this.plugin.t('imageModelTurbo') },
+			{ id: 'gptimage', name: this.plugin.t('imageModelGPT') },
+			{ id: 'kontext', name: this.plugin.t('imageModelKontext') },
+			{ id: 'seedream', name: this.plugin.t('imageModelSeeDream') },
+			{ id: 'nanobanana', name: this.plugin.t('imageModelNanobanana') }
+		];
+
+		// Model selector
+		const modelContainer = contentEl.createDiv();
+		modelContainer.createEl('label', { text: this.plugin.t('model') + ':' });
+		this.modelSelect = new DropdownComponent(modelContainer);
+		imageModels.forEach(model => {
+			this.modelSelect.addOption(model.id, model.name);
+		});
+		this.modelSelect.setValue(this.plugin.settings.defaultImageModel);
+
+		// Prompt input
+		const promptContainer = contentEl.createDiv();
+		promptContainer.createEl('label', { text: this.plugin.t('prompt') + ':' });
+		this.promptInput = new TextComponent(promptContainer);
+		this.promptInput.inputEl.placeholder = this.plugin.t('enterPrompt');
+		this.promptInput.inputEl.addClass('input-full');
+		this.promptInput.inputEl.addClass('input-tall');
+
+		// Size settings
+		const sizeContainer = contentEl.createDiv();
+		sizeContainer.createEl('label', { text: this.plugin.t('size') + ':' });
+		
+		const sizeInputContainer = sizeContainer.createDiv();
+		sizeInputContainer.setCssProps({
+			'display': 'flex',
+			'gap': '10px',
+			'align-items': 'center',
+			'margin-top': '5px'
+		});
+
+		this.widthInput = new TextComponent(sizeInputContainer);
+		this.widthInput.setValue('1024');
+		this.widthInput.inputEl.setCssProps({ 'width': '80px' });
+		
+		sizeInputContainer.createSpan({ text: '×' });
+		
+		this.heightInput = new TextComponent(sizeInputContainer);
+		this.heightInput.setValue('1024');
+		this.heightInput.inputEl.setCssProps({ 'width': '80px' });
+
+		// Buttons
+		const buttonContainer = contentEl.createDiv();
+
+		const generateButton = new ButtonComponent(buttonContainer);
+		generateButton.setButtonText(this.plugin.t('generate'));
+		generateButton.setCta();
+		generateButton.onClick(() => this.generateImage());
+
+		const cancelButton = new ButtonComponent(buttonContainer);
+		cancelButton.setButtonText(this.plugin.t('cancel'));
+		cancelButton.onClick(() => this.close());
+	}
+
+	async generateImage() {
+		const prompt = this.promptInput.getValue().trim();
+		
+		if (!prompt) {
+			new Notice(this.plugin.t('enterPromptMsg'));
+			return;
+		}
+
+		const model = this.modelSelect.getValue();
+		const width = parseInt(this.widthInput.getValue()) || 1024;
+		const height = parseInt(this.heightInput.getValue()) || 1024;
+
+		const loadingNotice = new Notice(this.plugin.t('generating'), 0);
+
+		try {
+			const result = await this.plugin.generateImage(prompt, model, width, height);
+
+			loadingNotice.hide();
+
+			if (result.error) {
+				new Notice(`Error: ${result.error}`);
+				return;
+			}
+
+			if (result.imageData && result.filename) {
+				const filePath = await this.plugin.saveImage(result.imageData, result.filename);
+				
+				if (filePath) {
+					new Notice(`Image saved: ${filePath}`);
+					
+					// Insert image link into active note
+					const activeFile = this.app.workspace.getActiveFile();
+					if (activeFile) {
+						const editor = this.app.workspace.activeEditor?.editor;
+						if (editor) {
+							editor.replaceSelection(`![[${filePath}]]\n`);
+						}
+					}
+					
+					this.close();
+				} else {
+					new Notice('Failed to save image');
+				}
+			}
+		} catch (error) {
+			loadingNotice.hide();
+			new Notice(`Error: ${error}`);
+		}
+	}
+
+	onClose() {
+		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
 class PollinationsAISettingTab extends PluginSettingTab {
 	plugin: PollinationsAIPlugin;
 
@@ -456,14 +951,58 @@ class PollinationsAISettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl('h2', { text: 'Настройки Pollinations AI' });
+		new Setting(containerEl)
+			.setName(this.plugin.t('settingsTitle'))
+			.setHeading();
 
 		new Setting(containerEl)
-			.setName('Модель по умолчанию')
-			.setDesc('Выберите модель ИИ по умолчанию')
+			.setName(this.plugin.t('language'))
+			.setDesc(this.plugin.t('languageDesc'))
 			.addDropdown(dropdown => {
-				this.plugin.models.forEach(model => {
-					dropdown.addOption(model.name, `${model.name} - ${model.description}`);
+				dropdown.addOption('en', 'English');
+				dropdown.addOption('ru', 'Русский');
+				dropdown.setValue(this.plugin.settings.language);
+				dropdown.onChange(async (value: 'en' | 'ru') => {
+					this.plugin.settings.language = value;
+					await this.plugin.saveSettings();
+					this.display(); // Refresh to show new language
+				});
+			});
+
+		new Setting(containerEl)
+			.setName(this.plugin.t('showFreeModelsOnly'))
+			.setDesc(this.plugin.t('showFreeModelsOnlyDesc'))
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.showFreeModelsOnly)
+				.onChange(async (value) => {
+					this.plugin.settings.showFreeModelsOnly = value;
+					await this.plugin.saveSettings();
+					this.display(); // Refresh to update model dropdowns
+				}));
+
+		new Setting(containerEl)
+			.setName(this.plugin.t('defaultModel'))
+			.setDesc(this.plugin.t('defaultModelDesc'))
+			.addDropdown(dropdown => {
+				// Filter models based on showFreeModelsOnly setting
+				const modelsToShow = this.plugin.settings.showFreeModelsOnly 
+					? this.plugin.models.filter(m => this.plugin.isModelFree(m.name))
+					: this.plugin.models;
+				
+				// Group models by category
+				const categories = new Map<string, AIModel[]>();
+				modelsToShow.forEach(model => {
+					const category = this.plugin.getCategoryForModel(model.name);
+					if (!categories.has(category)) {
+						categories.set(category, []);
+					}
+					categories.get(category)!.push(model);
+				});
+				
+				categories.forEach((models, category) => {
+					models.forEach(model => {
+						dropdown.addOption(model.name, `[${category}] ${model.name}`);
+					});
 				});
 				dropdown.setValue(this.plugin.settings.defaultModel);
 				dropdown.onChange(async (value) => {
@@ -474,8 +1013,8 @@ class PollinationsAISettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('Сохранять чаты в заметки')
-			.setDesc('Автоматически сохранять разговоры с ИИ в заметки')
+			.setName(this.plugin.t('saveChatsToNotes'))
+			.setDesc(this.plugin.t('saveChatsDesc'))
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.saveToNotes)
 				.onChange(async (value) => {
@@ -484,10 +1023,10 @@ class PollinationsAISettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
-			.setName('Папка для заметок')
-			.setDesc('Папка, куда будут сохраняться чаты с ИИ')
+			.setName(this.plugin.t('notesFolder'))
+			.setDesc(this.plugin.t('notesFolderDesc'))
 			.addText(text => text
-				.setPlaceholder('AI Чаты')
+				.setPlaceholder('AI Chats')
 				.setValue(this.plugin.settings.notesFolder)
 				.onChange(async (value) => {
 					this.plugin.settings.notesFolder = value;
@@ -495,14 +1034,43 @@ class PollinationsAISettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
-			.setName('API токен')
-			.setDesc('Токен для доступа к API (если требуется)')
+			.setName(this.plugin.t('apiToken'))
+			.setDesc(this.plugin.t('apiTokenDesc'))
 			.addText(text => text
-				.setPlaceholder('Введите токен...')
+				.setPlaceholder(this.plugin.t('enterToken'))
 				.setValue(this.plugin.settings.apiToken)
 				.onChange(async (value) => {
 					this.plugin.settings.apiToken = value;
 					await this.plugin.saveSettings();
 				}));
+
+		new Setting(containerEl)
+			.setName(this.plugin.t('imagesFolder'))
+			.setDesc(this.plugin.t('imagesFolderDesc'))
+			.addText(text => text
+				.setPlaceholder('AI Images')
+				.setValue(this.plugin.settings.imagesFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.imagesFolder = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName(this.plugin.t('defaultImageModel'))
+			.setDesc(this.plugin.t('defaultImageModelDesc'))
+			.addDropdown(dropdown => {
+				dropdown.addOption('zimage', this.plugin.t('imageModelZimage'));
+				dropdown.addOption('flux', this.plugin.t('imageModelFlux'));
+				dropdown.addOption('turbo', this.plugin.t('imageModelTurbo'));
+				dropdown.addOption('gptimage', this.plugin.t('imageModelGPT'));
+				dropdown.addOption('kontext', this.plugin.t('imageModelKontext'));
+				dropdown.addOption('seedream', this.plugin.t('imageModelSeeDream'));
+				dropdown.addOption('nanobanana', this.plugin.t('imageModelNanobanana'));
+				dropdown.setValue(this.plugin.settings.defaultImageModel);
+				dropdown.onChange(async (value) => {
+					this.plugin.settings.defaultImageModel = value;
+					await this.plugin.saveSettings();
+				});
+			});
 	}
 }
