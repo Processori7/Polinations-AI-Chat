@@ -14,9 +14,9 @@ interface PollinationsAISettings {
 const DEFAULT_SETTINGS: PollinationsAISettings = {
 	defaultModel: 'openai',
 	saveToNotes: true,
-	notesFolder: 'AI Chats',
+	notesFolder: 'AI chats',
 	apiToken: '',
-	imagesFolder: 'AI Images',
+	imagesFolder: 'AI images',
 	defaultImageModel: 'zimage',
 	language: 'en',
 	showFreeModelsOnly: false
@@ -576,7 +576,7 @@ class AIchatModal extends Modal {
 		this.inputElement.inputEl.addEventListener('keypress', (e) => {
 			if (e.key === 'Enter' && !e.shiftKey) {
 				e.preventDefault();
-				this.sendMessage();
+				void this.sendMessage();
 			}
 		});
 
@@ -1042,7 +1042,7 @@ class PollinationsAISettingTab extends PluginSettingTab {
 			.setName(this.plugin.t('notesFolder'))
 			.setDesc(this.plugin.t('notesFolderDesc'))
 			.addText(text => text
-				.setPlaceholder('AI Chats')
+				.setPlaceholder('AI chats')
 				.setValue(this.plugin.settings.notesFolder)
 				.onChange(async (value) => {
 					this.plugin.settings.notesFolder = value;
@@ -1064,7 +1064,7 @@ class PollinationsAISettingTab extends PluginSettingTab {
 			.setName(this.plugin.t('imagesFolder'))
 			.setDesc(this.plugin.t('imagesFolderDesc'))
 			.addText(text => text
-				.setPlaceholder('AI Images')
+				.setPlaceholder('AI images')
 				.setValue(this.plugin.settings.imagesFolder)
 				.onChange(async (value) => {
 					this.plugin.settings.imagesFolder = value;

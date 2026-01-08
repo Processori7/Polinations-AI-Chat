@@ -31,9 +31,9 @@ var import_obsidian = require("obsidian");
 var DEFAULT_SETTINGS = {
   defaultModel: "openai",
   saveToNotes: true,
-  notesFolder: "AI Chats",
+  notesFolder: "AI chats",
   apiToken: "",
-  imagesFolder: "AI Images",
+  imagesFolder: "AI images",
   defaultImageModel: "zimage",
   language: "en",
   showFreeModelsOnly: false
@@ -484,7 +484,7 @@ var AIchatModal = class extends import_obsidian.Modal {
     this.inputElement.inputEl.addEventListener("keypress", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        this.sendMessage();
+        void this.sendMessage();
       }
     });
     const sendButton = new import_obsidian.ButtonComponent(inputContainer);
@@ -811,7 +811,7 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
       this.plugin.settings.saveToNotes = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName(this.plugin.t("notesFolder")).setDesc(this.plugin.t("notesFolderDesc")).addText((text) => text.setPlaceholder("AI Chats").setValue(this.plugin.settings.notesFolder).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("notesFolder")).setDesc(this.plugin.t("notesFolderDesc")).addText((text) => text.setPlaceholder("AI chats").setValue(this.plugin.settings.notesFolder).onChange(async (value) => {
       this.plugin.settings.notesFolder = value;
       await this.plugin.saveSettings();
     }));
@@ -819,7 +819,7 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
       this.plugin.settings.apiToken = value;
       await this.plugin.saveSettings();
     }));
-    new import_obsidian.Setting(containerEl).setName(this.plugin.t("imagesFolder")).setDesc(this.plugin.t("imagesFolderDesc")).addText((text) => text.setPlaceholder("AI Images").setValue(this.plugin.settings.imagesFolder).onChange(async (value) => {
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("imagesFolder")).setDesc(this.plugin.t("imagesFolderDesc")).addText((text) => text.setPlaceholder("AI images").setValue(this.plugin.settings.imagesFolder).onChange(async (value) => {
       this.plugin.settings.imagesFolder = value;
       await this.plugin.saveSettings();
     }));
