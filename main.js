@@ -35,6 +35,9 @@ var DEFAULT_SETTINGS = {
   apiToken: "",
   imagesFolder: "AI images",
   defaultImageModel: "zimage",
+  videosFolder: "AI videos",
+  audioFolder: "AI audio",
+  defaultVideoModel: "veo",
   language: "en",
   showFreeModelsOnly: false
 };
@@ -44,16 +47,25 @@ var TRANSLATIONS = {
     openAIChat: "Open AI chat",
     quickAIQuestion: "Quick AI question",
     generateAIImage: "Generate AI image",
+    generateAIVideo: "Generate AI video",
+    generateAIAudio: "Generate AI audio",
     aiChat: "AI chat",
     // Modal titles
     aiChatTitle: "AI chat",
     quickQuestionTitle: "Quick AI question",
     imageGenerationTitle: "Generate AI image",
+    videoGenerationTitle: "Generate AI video",
+    audioGenerationTitle: "Generate AI audio",
     // Labels
     model: "Model",
     prompt: "Prompt",
     size: "Size",
     yourQuestion: "Your question",
+    duration: "Duration (seconds)",
+    aspectRatio: "Aspect ratio",
+    voice: "Voice",
+    attachImage: "Attach image",
+    uploadImage: "Upload image",
     // Placeholders
     enterQuestion: "Enter your question...",
     enterPrompt: "Describe the image you want to generate...",
@@ -74,10 +86,17 @@ var TRANSLATIONS = {
     saveError: "Save error",
     imageSaved: "Image saved",
     imageError: "Failed to save image",
+    videoSaved: "Video saved",
+    videoError: "Failed to save video",
+    audioSaved: "Audio saved",
+    audioError: "Failed to save audio",
     generating: "Generating image...",
+    generatingVideo: "Generating video...",
+    generatingAudio: "Generating audio...",
     answerSaved: "Answer saved to note",
     unexpectedResponse: "Unexpected API response",
     error: "Error",
+    imageUploaded: "Image uploaded",
     // User/AI labels
     user: "You",
     ai: "AI",
@@ -95,6 +114,12 @@ var TRANSLATIONS = {
     imagesFolderDesc: "Folder where generated images will be saved",
     defaultImageModel: "Default image model",
     defaultImageModelDesc: "Default model for image generation",
+    videosFolder: "Videos folder",
+    videosFolderDesc: "Folder where generated videos will be saved",
+    defaultVideoModel: "Default video model",
+    defaultVideoModelDesc: "Default model for video generation",
+    audioFolder: "Audio folder",
+    audioFolderDesc: "Folder where generated audio will be saved",
     language: "Language",
     languageDesc: "Interface language",
     showFreeModelsOnly: "Show only free models",
@@ -102,6 +127,7 @@ var TRANSLATIONS = {
     // Model categories
     categoryText: "Text",
     categoryImages: "Images",
+    categoryVideo: "Video",
     categoryAudio: "Audio",
     // Image models
     imageModelZimage: "Zimage (Default)",
@@ -117,16 +143,25 @@ var TRANSLATIONS = {
     openAIChat: "\u041E\u0442\u043A\u0440\u044B\u0442\u044C \u0418\u0418 \u0447\u0430\u0442",
     quickAIQuestion: "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441 \u0418\u0418",
     generateAIImage: "\u0413\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0418\u0418 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435",
+    generateAIVideo: "\u0413\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0418\u0418 \u0432\u0438\u0434\u0435\u043E",
+    generateAIAudio: "\u0413\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0418\u0418 \u0430\u0443\u0434\u0438\u043E",
     aiChat: "\u0418\u0418 \u0447\u0430\u0442",
     // Modal titles
     aiChatTitle: "\u0418\u0418 \u0447\u0430\u0442",
     quickQuestionTitle: "\u0411\u044B\u0441\u0442\u0440\u044B\u0439 \u0432\u043E\u043F\u0440\u043E\u0441 \u0418\u0418",
     imageGenerationTitle: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0418\u0418 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F",
+    videoGenerationTitle: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0418\u0418 \u0432\u0438\u0434\u0435\u043E",
+    audioGenerationTitle: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0418\u0418 \u0430\u0443\u0434\u0438\u043E",
     // Labels
     model: "\u041C\u043E\u0434\u0435\u043B\u044C",
     prompt: "\u041F\u0440\u043E\u043C\u043F\u0442",
     size: "\u0420\u0430\u0437\u043C\u0435\u0440",
     yourQuestion: "\u0412\u0430\u0448 \u0432\u043E\u043F\u0440\u043E\u0441",
+    duration: "\u0414\u043B\u0438\u0442\u0435\u043B\u044C\u043D\u043E\u0441\u0442\u044C (\u0441\u0435\u043A\u0443\u043D\u0434\u044B)",
+    aspectRatio: "\u0421\u043E\u043E\u0442\u043D\u043E\u0448\u0435\u043D\u0438\u0435 \u0441\u0442\u043E\u0440\u043E\u043D",
+    voice: "\u0413\u043E\u043B\u043E\u0441",
+    attachImage: "\u041F\u0440\u0438\u043A\u0440\u0435\u043F\u0438\u0442\u044C \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435",
+    uploadImage: "\u0417\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u044C \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435",
     // Placeholders
     enterQuestion: "\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u0432\u0430\u0448 \u0432\u043E\u043F\u0440\u043E\u0441...",
     enterPrompt: "\u041E\u043F\u0438\u0448\u0438\u0442\u0435 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435, \u043A\u043E\u0442\u043E\u0440\u043E\u0435 \u0445\u043E\u0442\u0438\u0442\u0435 \u0441\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u0442\u044C...",
@@ -147,10 +182,17 @@ var TRANSLATIONS = {
     saveError: "\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F",
     imageSaved: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E",
     imageError: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435",
+    videoSaved: "\u0412\u0438\u0434\u0435\u043E \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E",
+    videoError: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0432\u0438\u0434\u0435\u043E",
+    audioSaved: "\u0410\u0443\u0434\u0438\u043E \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u043E",
+    audioError: "\u041D\u0435 \u0443\u0434\u0430\u043B\u043E\u0441\u044C \u0441\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0430\u0443\u0434\u0438\u043E",
     generating: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F...",
+    generatingVideo: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0432\u0438\u0434\u0435\u043E...",
+    generatingAudio: "\u0413\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u044F \u0430\u0443\u0434\u0438\u043E...",
     answerSaved: "\u041E\u0442\u0432\u0435\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D \u0432 \u0437\u0430\u043C\u0435\u0442\u043A\u0443",
     unexpectedResponse: "\u041F\u043E\u043B\u0443\u0447\u0435\u043D \u043D\u0435\u043E\u0436\u0438\u0434\u0430\u043D\u043D\u044B\u0439 \u043E\u0442\u0432\u0435\u0442 \u043E\u0442 API",
     error: "\u041E\u0448\u0438\u0431\u043A\u0430",
+    imageUploaded: "\u0418\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0435 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043D\u043E",
     // User/AI labels
     user: "\u0412\u044B",
     ai: "\u0418\u0418",
@@ -168,6 +210,12 @@ var TRANSLATIONS = {
     imagesFolderDesc: "\u041F\u0430\u043F\u043A\u0430, \u043A\u0443\u0434\u0430 \u0431\u0443\u0434\u0443\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C\u0441\u044F \u0441\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u044F",
     defaultImageModel: "\u041C\u043E\u0434\u0435\u043B\u044C \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
     defaultImageModelDesc: "\u041C\u043E\u0434\u0435\u043B\u044C \u0434\u043B\u044F \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u0438 \u0438\u0437\u043E\u0431\u0440\u0430\u0436\u0435\u043D\u0438\u0439 \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+    videosFolder: "\u041F\u0430\u043F\u043A\u0430 \u0434\u043B\u044F \u0432\u0438\u0434\u0435\u043E",
+    videosFolderDesc: "\u041F\u0430\u043F\u043A\u0430, \u043A\u0443\u0434\u0430 \u0431\u0443\u0434\u0443\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C\u0441\u044F \u0441\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 \u0432\u0438\u0434\u0435\u043E",
+    defaultVideoModel: "\u041C\u043E\u0434\u0435\u043B\u044C \u0432\u0438\u0434\u0435\u043E \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+    defaultVideoModelDesc: "\u041C\u043E\u0434\u0435\u043B\u044C \u0434\u043B\u044F \u0433\u0435\u043D\u0435\u0440\u0430\u0446\u0438\u0438 \u0432\u0438\u0434\u0435\u043E \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E",
+    audioFolder: "\u041F\u0430\u043F\u043A\u0430 \u0434\u043B\u044F \u0430\u0443\u0434\u0438\u043E",
+    audioFolderDesc: "\u041F\u0430\u043F\u043A\u0430, \u043A\u0443\u0434\u0430 \u0431\u0443\u0434\u0443\u0442 \u0441\u043E\u0445\u0440\u0430\u043D\u044F\u0442\u044C\u0441\u044F \u0441\u0433\u0435\u043D\u0435\u0440\u0438\u0440\u043E\u0432\u0430\u043D\u043D\u044B\u0435 \u0430\u0443\u0434\u0438\u043E",
     language: "\u042F\u0437\u044B\u043A",
     languageDesc: "\u042F\u0437\u044B\u043A \u0438\u043D\u0442\u0435\u0440\u0444\u0435\u0439\u0441\u0430",
     showFreeModelsOnly: "\u041F\u043E\u043A\u0430\u0437\u044B\u0432\u0430\u0442\u044C \u0442\u043E\u043B\u044C\u043A\u043E \u0431\u0435\u0441\u043F\u043B\u0430\u0442\u043D\u044B\u0435 \u043C\u043E\u0434\u0435\u043B\u0438",
@@ -175,6 +223,7 @@ var TRANSLATIONS = {
     // Model categories
     categoryText: "\u0422\u0435\u043A\u0441\u0442",
     categoryImages: "\u041A\u0430\u0440\u0442\u0438\u043D\u043A\u0438",
+    categoryVideo: "\u0412\u0438\u0434\u0435\u043E",
     categoryAudio: "\u0410\u0443\u0434\u0438\u043E",
     // Image models
     imageModelZimage: "Zimage (\u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E)",
@@ -196,13 +245,26 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
   }
   getCategoryForModel(modelName) {
     const name = modelName.toLowerCase();
-    if (name.includes("flux") || name === "turbo" || name === "gptimage" || name === "kontext" || name.includes("seedream") || name.includes("nanobanana") || name === "zimage" || name === "veo" || name.includes("seedance")) {
+    if (name === "veo" || name.includes("seedance")) {
+      return this.t("categoryVideo");
+    }
+    if (name.includes("flux") || name === "turbo" || name === "gptimage" || name === "kontext" || name.includes("seedream") || name.includes("nanobanana") || name === "zimage") {
       return this.t("categoryImages");
     }
     if (name.includes("audio") || name.includes("tts") || name.includes("speech") || name.includes("midijourney")) {
       return this.t("categoryAudio");
     }
     return this.t("categoryText");
+  }
+  modelSupportsImages(modelName) {
+    const model = this.models.find((m) => m.name === modelName);
+    if (!model || !model.input_modalities) return false;
+    return model.input_modalities.indexOf("image") !== -1 || model.input_modalities.indexOf("vision") !== -1;
+  }
+  modelSupportsImageInput(modelName) {
+    const model = this.models.find((m) => m.name === modelName);
+    if (!model || !model.input_modalities) return false;
+    return model.input_modalities.includes("image");
   }
   isModelFree(modelName) {
     const name = modelName.toLowerCase();
@@ -224,7 +286,7 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       "nanobanana",
       "zimage"
     ];
-    return freeModels.includes(name);
+    return freeModels.indexOf(name) !== -1;
   }
   async onload() {
     await this.loadSettings();
@@ -249,6 +311,20 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       name: this.t("generateAIImage"),
       callback: () => {
         new ImageGenerationModal(this.app, this).open();
+      }
+    });
+    this.addCommand({
+      id: "generate-ai-video",
+      name: this.t("generateAIVideo"),
+      callback: () => {
+        new VideoGenerationModal(this.app, this).open();
+      }
+    });
+    this.addCommand({
+      id: "generate-ai-audio",
+      name: this.t("generateAIAudio"),
+      callback: () => {
+        new AudioGenerationModal(this.app, this).open();
       }
     });
     this.addSettingTab(new PollinationsAISettingTab(this.app, this));
@@ -395,7 +471,7 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
   async saveSettings() {
     await this.saveData(this.settings);
   }
-  async generateImage(prompt, model = "zimage", width = 1024, height = 1024) {
+  async generateImage(prompt, model = "zimage", width = 1024, height = 1024, referenceImage) {
     try {
       if (!this.settings.apiToken) {
         return { error: "API key required for image generation. Please add it in settings." };
@@ -407,11 +483,23 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       url.searchParams.set("nologo", "true");
       url.searchParams.set("private", "true");
       url.searchParams.set("key", this.settings.apiToken);
+      if (referenceImage && this.modelSupportsImageInput(model)) {
+        if (referenceImage.startsWith("http://") || referenceImage.startsWith("https://")) {
+          url.searchParams.set("image", referenceImage);
+          console.log("Image-to-image with URL:", referenceImage.substring(0, 100));
+        } else if (referenceImage.startsWith("data:")) {
+          return {
+            error: "Local files cannot be used for image editing. Please use a public image URL (http:// or https://) instead."
+          };
+        }
+      }
+      console.log("Generating image...");
       const response = await (0, import_obsidian.requestUrl)({
         url: url.toString(),
         method: "GET",
         throw: false
       });
+      console.log("Image generation response:", { status: response.status, hasArrayBuffer: !!response.arrayBuffer });
       if (response.status === 200 && response.arrayBuffer) {
         const timestamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-");
         const filename = `ai-image-${timestamp}.png`;
@@ -441,11 +529,129 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       return null;
     }
   }
+  async generateVideo(prompt, model = "veo", duration = 4, aspectRatio = "16:9", referenceImage) {
+    try {
+      if (!this.settings.apiToken) {
+        return { error: "API key required for video generation. Please add it in settings." };
+      }
+      const url = new URL(`https://gen.pollinations.ai/image/${encodeURIComponent(prompt)}`);
+      url.searchParams.set("model", model);
+      url.searchParams.set("duration", duration.toString());
+      url.searchParams.set("aspectRatio", aspectRatio);
+      url.searchParams.set("nologo", "true");
+      url.searchParams.set("private", "true");
+      url.searchParams.set("key", this.settings.apiToken);
+      if (referenceImage) {
+        url.searchParams.set("image", referenceImage);
+      }
+      const response = await (0, import_obsidian.requestUrl)({
+        url: url.toString(),
+        method: "GET",
+        throw: false
+      });
+      if (response.status === 200 && response.arrayBuffer) {
+        const timestamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-");
+        const filename = `ai-video-${timestamp}.mp4`;
+        return {
+          videoData: response.arrayBuffer,
+          filename
+        };
+      } else {
+        const errorText = response.text || response.json ? JSON.stringify(response.json) : "Unknown error";
+        return { error: `HTTP ${response.status}: ${errorText}` };
+      }
+    } catch (error) {
+      return { error: error.toString() };
+    }
+  }
+  async saveVideo(videoData, filename) {
+    try {
+      const folderPath = this.settings.videosFolder;
+      if (!this.app.vault.getAbstractFileByPath(folderPath)) {
+        await this.app.vault.createFolder(folderPath);
+      }
+      const filePath = `${folderPath}/${filename}`;
+      await this.app.vault.createBinary(filePath, videoData);
+      return filePath;
+    } catch (error) {
+      console.error("Error saving video:", error);
+      return null;
+    }
+  }
+  async generateAudio(text, voice = "alloy") {
+    var _a, _b, _c, _d;
+    try {
+      if (!this.settings.apiToken) {
+        return { error: "API key required for audio generation. Please add it in settings." };
+      }
+      const headers = {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${this.settings.apiToken}`
+      };
+      const requestBody = {
+        model: "openai",
+        messages: [{ role: "user", content: text }],
+        modalities: ["audio"],
+        audio: {
+          voice,
+          format: "wav"
+        }
+      };
+      const response = await (0, import_obsidian.requestUrl)({
+        url: "https://gen.pollinations.ai/v1/chat/completions",
+        method: "POST",
+        headers,
+        body: JSON.stringify(requestBody),
+        throw: false
+      });
+      if (response.status === 200 && response.json) {
+        const audioData = (_d = (_c = (_b = (_a = response.json.choices) == null ? void 0 : _a[0]) == null ? void 0 : _b.message) == null ? void 0 : _c.audio) == null ? void 0 : _d.data;
+        if (audioData) {
+          const binaryString = atob(audioData);
+          const bytes = new Uint8Array(binaryString.length);
+          for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+          }
+          const timestamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-");
+          const filename = `ai-audio-${timestamp}.wav`;
+          return {
+            audioData: bytes.buffer,
+            filename
+          };
+        } else {
+          return { error: "No audio data in response" };
+        }
+      } else {
+        const errorText = response.text || response.json ? JSON.stringify(response.json) : "Unknown error";
+        return { error: `HTTP ${response.status}: ${errorText}` };
+      }
+    } catch (error) {
+      return { error: error.toString() };
+    }
+  }
+  async saveAudio(audioData, filename) {
+    try {
+      const folderPath = this.settings.audioFolder;
+      if (!this.app.vault.getAbstractFileByPath(folderPath)) {
+        await this.app.vault.createFolder(folderPath);
+      }
+      const filePath = `${folderPath}/${filename}`;
+      await this.app.vault.createBinary(filePath, audioData);
+      return filePath;
+    } catch (error) {
+      console.error("Error saving audio:", error);
+      return null;
+    }
+  }
 };
 var AIchatModal = class extends import_obsidian.Modal {
   constructor(app, plugin) {
     super(app);
     this.conversation = [];
+    this.attachedImageUrl = null;
+    this.attachedImageEl = null;
+    this.promptHistory = [];
+    this.historyIndex = -1;
     this.plugin = plugin;
   }
   onOpen() {
@@ -469,7 +675,7 @@ var AIchatModal = class extends import_obsidian.Modal {
     });
     categories.forEach((models, category) => {
       models.forEach((model) => {
-        this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
+        this.modelSelect.addOption(model.name, `[${category}] ${model.description}`);
       });
     });
     this.modelSelect.setValue(this.plugin.currentModel);
@@ -481,19 +687,26 @@ var AIchatModal = class extends import_obsidian.Modal {
     this.inputElement = new import_obsidian.TextComponent(inputContainer);
     this.inputElement.inputEl.placeholder = this.plugin.t("enterQuestion");
     this.inputElement.inputEl.addClass("input-wide");
-    this.inputElement.inputEl.addEventListener("keypress", (e) => {
+    this.inputElement.inputEl.addClass("chat-input-multiline");
+    this.inputElement.inputEl.addEventListener("keydown", (e) => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         void this.sendMessage();
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        this.navigateHistory("up");
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        this.navigateHistory("down");
       }
     });
     const sendButton = new import_obsidian.ButtonComponent(inputContainer);
     sendButton.setButtonText(this.plugin.t("send"));
-    sendButton.onClick(() => this.sendMessage());
+    sendButton.onClick(() => void this.sendMessage());
     const buttonContainer = contentEl.createDiv("button-container");
     const saveButton = new import_obsidian.ButtonComponent(buttonContainer);
     saveButton.setButtonText(this.plugin.t("saveChat"));
-    saveButton.onClick(() => this.saveChat());
+    saveButton.onClick(() => void this.saveChat());
     const clearButton = new import_obsidian.ButtonComponent(buttonContainer);
     clearButton.setButtonText(this.plugin.t("clear"));
     clearButton.onClick(() => this.clearChat());
@@ -501,14 +714,36 @@ var AIchatModal = class extends import_obsidian.Modal {
   async sendMessage() {
     const message = this.inputElement.getValue().trim();
     if (!message) return;
+    this.promptHistory.push(message);
+    this.historyIndex = this.promptHistory.length;
     this.addMessage("user", message);
     this.inputElement.setValue("");
-    const isImageModel = this.plugin.getCategoryForModel(this.plugin.currentModel) === this.plugin.t("categoryImages");
+    const category = this.plugin.getCategoryForModel(this.plugin.currentModel);
+    const isImageModel = category === this.plugin.t("categoryImages");
+    const isVideoModel = category === this.plugin.t("categoryVideo");
     const loadingEl = this.chatContainer.createDiv("loading-message");
     loadingEl.textContent = "\u{1F916} " + this.plugin.t("thinking");
     try {
-      if (isImageModel) {
-        const result = await this.plugin.generateImage(message, this.plugin.currentModel, 1024, 1024);
+      if (isVideoModel) {
+        const result = await this.plugin.generateVideo(message, this.plugin.currentModel, 4, "16:9");
+        loadingEl.remove();
+        if (result.error) {
+          this.addMessage("assistant", `${this.plugin.t("error")}: ${result.error}`);
+        } else if (result.videoData && result.filename) {
+          const filePath = await this.plugin.saveVideo(result.videoData, result.filename);
+          if (filePath) {
+            this.addMessage("assistant", `${this.plugin.t("videoSaved")}: [[${filePath}]]`);
+          } else {
+            this.addMessage("assistant", this.plugin.t("videoError"));
+          }
+        }
+      } else if (isImageModel) {
+        const result = await this.plugin.generateImage(
+          message,
+          this.plugin.currentModel,
+          1024,
+          1024
+        );
         loadingEl.remove();
         if (result.error) {
           this.addMessage("assistant", `${this.plugin.t("error")}: ${result.error}`);
@@ -540,6 +775,23 @@ var AIchatModal = class extends import_obsidian.Modal {
       this.addMessage("assistant", `${this.plugin.t("error")}: ${error}`);
     }
   }
+  navigateHistory(direction) {
+    if (this.promptHistory.length === 0) return;
+    if (direction === "up") {
+      if (this.historyIndex > 0) {
+        this.historyIndex--;
+        this.inputElement.setValue(this.promptHistory[this.historyIndex]);
+      }
+    } else {
+      if (this.historyIndex < this.promptHistory.length - 1) {
+        this.historyIndex++;
+        this.inputElement.setValue(this.promptHistory[this.historyIndex]);
+      } else {
+        this.historyIndex = this.promptHistory.length;
+        this.inputElement.setValue("");
+      }
+    }
+  }
   addMessage(role, content) {
     const message = {
       role,
@@ -558,7 +810,6 @@ var AIchatModal = class extends import_obsidian.Modal {
     headerSmall.textContent = message.timestamp.toLocaleTimeString("ru-RU");
     const contentDiv = messageEl.createDiv("message-content");
     contentDiv.textContent = content;
-    this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
   }
   async saveChat() {
     if (this.conversation.length === 0) {
@@ -603,10 +854,9 @@ var QuickQuestionModal = class extends import_obsidian.Modal {
     });
     categories.forEach((models, category) => {
       models.forEach((model) => {
-        this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
+        this.modelSelect.addOption(model.name, `[${category}] ${model.description}`);
       });
     });
-    this.modelSelect.setValue(this.plugin.currentModel);
     const inputContainer = contentEl.createDiv();
     inputContainer.createEl("label", { text: this.plugin.t("yourQuestion") + ":" });
     this.inputElement = new import_obsidian.TextComponent(inputContainer);
@@ -662,25 +912,26 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
     super(app);
     this.plugin = plugin;
   }
+  updateModelList() {
+    this.modelSelect.selectEl.empty();
+    const imageModels = this.plugin.models.filter((m) => {
+      const category = this.plugin.getCategoryForModel(m.name);
+      return category === this.plugin.t("categoryImages");
+    });
+    imageModels.forEach((model) => {
+      this.modelSelect.addOption(model.name, model.description);
+    });
+    if (imageModels.length === 0) {
+    }
+  }
   onOpen() {
     const { contentEl } = this;
     contentEl.empty();
     contentEl.createEl("h2", { text: this.plugin.t("imageGenerationTitle") });
-    const imageModels = [
-      { id: "zimage", name: this.plugin.t("imageModelZimage") },
-      { id: "flux", name: this.plugin.t("imageModelFlux") },
-      { id: "turbo", name: this.plugin.t("imageModelTurbo") },
-      { id: "gptimage", name: this.plugin.t("imageModelGPT") },
-      { id: "kontext", name: this.plugin.t("imageModelKontext") },
-      { id: "seedream", name: this.plugin.t("imageModelSeeDream") },
-      { id: "nanobanana", name: this.plugin.t("imageModelNanobanana") }
-    ];
     const modelContainer = contentEl.createDiv();
     modelContainer.createEl("label", { text: this.plugin.t("model") + ":" });
     this.modelSelect = new import_obsidian.DropdownComponent(modelContainer);
-    imageModels.forEach((model) => {
-      this.modelSelect.addOption(model.id, model.name);
-    });
+    this.updateModelList();
     this.modelSelect.setValue(this.plugin.settings.defaultImageModel);
     const promptContainer = contentEl.createDiv();
     promptContainer.createEl("label", { text: this.plugin.t("prompt") + ":" });
@@ -690,20 +941,14 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
     this.promptInput.inputEl.addClass("input-tall");
     const sizeContainer = contentEl.createDiv();
     sizeContainer.createEl("label", { text: this.plugin.t("size") + ":" });
-    const sizeInputContainer = sizeContainer.createDiv();
-    sizeInputContainer.setCssProps({
-      "display": "flex",
-      "gap": "10px",
-      "align-items": "center",
-      "margin-top": "5px"
-    });
+    const sizeInputContainer = sizeContainer.createDiv("size-input-container");
     this.widthInput = new import_obsidian.TextComponent(sizeInputContainer);
     this.widthInput.setValue("1024");
-    this.widthInput.inputEl.setCssProps({ "width": "80px" });
+    this.widthInput.inputEl.addClass("dimension-input");
     sizeInputContainer.createSpan({ text: "\xD7" });
     this.heightInput = new import_obsidian.TextComponent(sizeInputContainer);
     this.heightInput.setValue("1024");
-    this.heightInput.inputEl.setCssProps({ "width": "80px" });
+    this.heightInput.inputEl.addClass("dimension-input");
     const buttonContainer = contentEl.createDiv();
     const generateButton = new import_obsidian.ButtonComponent(buttonContainer);
     generateButton.setButtonText(this.plugin.t("generate"));
@@ -758,6 +1003,173 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
     contentEl.empty();
   }
 };
+var VideoGenerationModal = class extends import_obsidian.Modal {
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.createEl("h2", { text: this.plugin.t("videoGenerationTitle") });
+    const videoModels = [
+      { id: "veo", name: "Veo (4-8s, text-to-video)" },
+      { id: "seedance", name: "Seedance (2-10s, text/image-to-video)" },
+      { id: "seedance-pro", name: "Seedance Pro" }
+    ];
+    const modelContainer = contentEl.createDiv();
+    modelContainer.createEl("label", { text: this.plugin.t("model") + ":" });
+    this.modelSelect = new import_obsidian.DropdownComponent(modelContainer);
+    videoModels.forEach((model) => {
+      this.modelSelect.addOption(model.id, model.name);
+    });
+    this.modelSelect.setValue(this.plugin.settings.defaultVideoModel);
+    const promptContainer = contentEl.createDiv();
+    promptContainer.createEl("label", { text: this.plugin.t("prompt") + ":" });
+    this.promptInput = new import_obsidian.TextComponent(promptContainer);
+    this.promptInput.inputEl.placeholder = this.plugin.t("enterPrompt");
+    this.promptInput.inputEl.addClass("input-full");
+    this.promptInput.inputEl.addClass("input-tall");
+    const durationContainer = contentEl.createDiv();
+    durationContainer.createEl("label", { text: this.plugin.t("duration") + ":" });
+    this.durationInput = new import_obsidian.TextComponent(durationContainer);
+    this.durationInput.setValue("4");
+    this.durationInput.inputEl.addClass("duration-input");
+    const aspectContainer = contentEl.createDiv();
+    aspectContainer.createEl("label", { text: this.plugin.t("aspectRatio") + ":" });
+    this.aspectRatioSelect = new import_obsidian.DropdownComponent(aspectContainer);
+    this.aspectRatioSelect.addOption("16:9", "16:9 (Landscape)");
+    this.aspectRatioSelect.addOption("9:16", "9:16 (Portrait)");
+    this.aspectRatioSelect.setValue("16:9");
+    const buttonContainer = contentEl.createDiv();
+    const generateButton = new import_obsidian.ButtonComponent(buttonContainer);
+    generateButton.setButtonText(this.plugin.t("generate"));
+    generateButton.setCta();
+    generateButton.onClick(() => this.generateVideo());
+    const cancelButton = new import_obsidian.ButtonComponent(buttonContainer);
+    cancelButton.setButtonText(this.plugin.t("cancel"));
+    cancelButton.onClick(() => this.close());
+  }
+  async generateVideo() {
+    var _a;
+    const prompt = this.promptInput.getValue().trim();
+    if (!prompt) {
+      new import_obsidian.Notice(this.plugin.t("enterPromptMsg"));
+      return;
+    }
+    const model = this.modelSelect.getValue();
+    const duration = parseInt(this.durationInput.getValue()) || 4;
+    const aspectRatio = this.aspectRatioSelect.getValue();
+    const loadingNotice = new import_obsidian.Notice(this.plugin.t("generatingVideo"), 0);
+    try {
+      const result = await this.plugin.generateVideo(prompt, model, duration, aspectRatio);
+      loadingNotice.hide();
+      if (result.error) {
+        new import_obsidian.Notice(`${this.plugin.t("error")}: ${result.error}`);
+        return;
+      }
+      if (result.videoData && result.filename) {
+        const filePath = await this.plugin.saveVideo(result.videoData, result.filename);
+        if (filePath) {
+          new import_obsidian.Notice(`${this.plugin.t("videoSaved")}: ${filePath}`);
+          const activeFile = this.app.workspace.getActiveFile();
+          if (activeFile) {
+            const editor = (_a = this.app.workspace.activeEditor) == null ? void 0 : _a.editor;
+            if (editor) {
+              editor.replaceSelection(`![[${filePath}]]
+`);
+            }
+          }
+          this.close();
+        } else {
+          new import_obsidian.Notice(this.plugin.t("videoError"));
+        }
+      }
+    } catch (error) {
+      loadingNotice.hide();
+      new import_obsidian.Notice(`${this.plugin.t("error")}: ${error}`);
+    }
+  }
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+};
+var AudioGenerationModal = class extends import_obsidian.Modal {
+  constructor(app, plugin) {
+    super(app);
+    this.plugin = plugin;
+  }
+  onOpen() {
+    const { contentEl } = this;
+    contentEl.empty();
+    contentEl.createEl("h2", { text: this.plugin.t("audioGenerationTitle") });
+    const textContainer = contentEl.createDiv();
+    textContainer.createEl("label", { text: this.plugin.t("prompt") + ":" });
+    this.textInput = new import_obsidian.TextComponent(textContainer);
+    this.textInput.inputEl.placeholder = this.plugin.t("enterPrompt");
+    this.textInput.inputEl.addClass("input-full");
+    this.textInput.inputEl.addClass("input-tall");
+    const voiceContainer = contentEl.createDiv();
+    voiceContainer.createEl("label", { text: this.plugin.t("voice") + ":" });
+    this.voiceSelect = new import_obsidian.DropdownComponent(voiceContainer);
+    const voices = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"];
+    voices.forEach((voice) => {
+      this.voiceSelect.addOption(voice, voice.charAt(0).toUpperCase() + voice.slice(1));
+    });
+    this.voiceSelect.setValue("alloy");
+    const buttonContainer = contentEl.createDiv();
+    const generateButton = new import_obsidian.ButtonComponent(buttonContainer);
+    generateButton.setButtonText(this.plugin.t("generate"));
+    generateButton.setCta();
+    generateButton.onClick(() => this.generateAudio());
+    const cancelButton = new import_obsidian.ButtonComponent(buttonContainer);
+    cancelButton.setButtonText(this.plugin.t("cancel"));
+    cancelButton.onClick(() => this.close());
+  }
+  async generateAudio() {
+    var _a;
+    const text = this.textInput.getValue().trim();
+    if (!text) {
+      new import_obsidian.Notice(this.plugin.t("enterPromptMsg"));
+      return;
+    }
+    const voice = this.voiceSelect.getValue();
+    const loadingNotice = new import_obsidian.Notice(this.plugin.t("generatingAudio"), 0);
+    try {
+      const result = await this.plugin.generateAudio(text, voice);
+      loadingNotice.hide();
+      if (result.error) {
+        new import_obsidian.Notice(`${this.plugin.t("error")}: ${result.error}`);
+        return;
+      }
+      if (result.audioData && result.filename) {
+        const filePath = await this.plugin.saveAudio(result.audioData, result.filename);
+        if (filePath) {
+          new import_obsidian.Notice(`${this.plugin.t("audioSaved")}: ${filePath}`);
+          const activeFile = this.app.workspace.getActiveFile();
+          if (activeFile) {
+            const editor = (_a = this.app.workspace.activeEditor) == null ? void 0 : _a.editor;
+            if (editor) {
+              editor.replaceSelection(`![[${filePath}]]
+`);
+            }
+          }
+          this.close();
+        } else {
+          new import_obsidian.Notice(this.plugin.t("audioError"));
+        }
+      }
+    } catch (error) {
+      loadingNotice.hide();
+      new import_obsidian.Notice(`${this.plugin.t("error")}: ${error}`);
+    }
+  }
+  onClose() {
+    const { contentEl } = this;
+    contentEl.empty();
+  }
+};
 var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
   constructor(app, plugin) {
     super(app, plugin);
@@ -797,13 +1209,11 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
       });
       categories.forEach((models, category) => {
         models.forEach((model) => {
-          dropdown.addOption(model.name, `[${category}] ${model.name}`);
+          dropdown.addOption(model.name, `[${category}] ${model.description}`);
         });
       });
       dropdown.setValue(this.plugin.settings.defaultModel);
       dropdown.onChange(async (value) => {
-        this.plugin.settings.defaultModel = value;
-        this.plugin.currentModel = value;
         await this.plugin.saveSettings();
       });
     });
@@ -837,5 +1247,23 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
         await this.plugin.saveSettings();
       });
     });
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("videosFolder")).setDesc(this.plugin.t("videosFolderDesc")).addText((text) => text.setPlaceholder("AI videos").setValue(this.plugin.settings.videosFolder).onChange(async (value) => {
+      this.plugin.settings.videosFolder = value;
+      await this.plugin.saveSettings();
+    }));
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("defaultVideoModel")).setDesc(this.plugin.t("defaultVideoModelDesc")).addDropdown((dropdown) => {
+      dropdown.addOption("veo", "Veo");
+      dropdown.addOption("seedance", "Seedance");
+      dropdown.addOption("seedance-pro", "Seedance Pro");
+      dropdown.setValue(this.plugin.settings.defaultVideoModel);
+      dropdown.onChange(async (value) => {
+        this.plugin.settings.defaultVideoModel = value;
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian.Setting(containerEl).setName(this.plugin.t("audioFolder")).setDesc(this.plugin.t("audioFolderDesc")).addText((text) => text.setPlaceholder("AI audio").setValue(this.plugin.settings.audioFolder).onChange(async (value) => {
+      this.plugin.settings.audioFolder = value;
+      await this.plugin.saveSettings();
+    }));
   }
 };

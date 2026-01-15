@@ -7,6 +7,9 @@ interface PollinationsAISettings {
 	apiToken: string;
 	imagesFolder: string;
 	defaultImageModel: string;
+	videosFolder: string;
+	audioFolder: string;
+	defaultVideoModel: string;
 	language: 'en' | 'ru';
 	showFreeModelsOnly: boolean;
 }
@@ -18,6 +21,9 @@ const DEFAULT_SETTINGS: PollinationsAISettings = {
 	apiToken: '',
 	imagesFolder: 'AI images',
 	defaultImageModel: 'zimage',
+	videosFolder: 'AI videos',
+	audioFolder: 'AI audio',
+	defaultVideoModel: 'veo',
 	language: 'en',
 	showFreeModelsOnly: false
 }
@@ -28,18 +34,27 @@ const TRANSLATIONS = {
 		openAIChat: 'Open AI chat',
 		quickAIQuestion: 'Quick AI question',
 		generateAIImage: 'Generate AI image',
+		generateAIVideo: 'Generate AI video',
+		generateAIAudio: 'Generate AI audio',
 		aiChat: 'AI chat',
 		
 		// Modal titles
 		aiChatTitle: 'AI chat',
 		quickQuestionTitle: 'Quick AI question',
 		imageGenerationTitle: 'Generate AI image',
+		videoGenerationTitle: 'Generate AI video',
+		audioGenerationTitle: 'Generate AI audio',
 		
 		// Labels
 		model: 'Model',
 		prompt: 'Prompt',
 		size: 'Size',
 		yourQuestion: 'Your question',
+		duration: 'Duration (seconds)',
+		aspectRatio: 'Aspect ratio',
+		voice: 'Voice',
+		attachImage: 'Attach image',
+		uploadImage: 'Upload image',
 		
 		// Placeholders
 		enterQuestion: 'Enter your question...',
@@ -63,10 +78,17 @@ const TRANSLATIONS = {
 		saveError: 'Save error',
 		imageSaved: 'Image saved',
 		imageError: 'Failed to save image',
+		videoSaved: 'Video saved',
+		videoError: 'Failed to save video',
+		audioSaved: 'Audio saved',
+		audioError: 'Failed to save audio',
 		generating: 'Generating image...',
+		generatingVideo: 'Generating video...',
+		generatingAudio: 'Generating audio...',
 		answerSaved: 'Answer saved to note',
 		unexpectedResponse: 'Unexpected API response',
 		error: 'Error',
+		imageUploaded: 'Image uploaded',
 		
 		// User/AI labels
 		user: 'You',
@@ -86,6 +108,12 @@ const TRANSLATIONS = {
 		imagesFolderDesc: 'Folder where generated images will be saved',
 		defaultImageModel: 'Default image model',
 		defaultImageModelDesc: 'Default model for image generation',
+		videosFolder: 'Videos folder',
+		videosFolderDesc: 'Folder where generated videos will be saved',
+		defaultVideoModel: 'Default video model',
+		defaultVideoModelDesc: 'Default model for video generation',
+		audioFolder: 'Audio folder',
+		audioFolderDesc: 'Folder where generated audio will be saved',
 		language: 'Language',
 		languageDesc: 'Interface language',
 		showFreeModelsOnly: 'Show only free models',
@@ -94,6 +122,7 @@ const TRANSLATIONS = {
 		// Model categories
 		categoryText: 'Text',
 		categoryImages: 'Images',
+		categoryVideo: 'Video',
 		categoryAudio: 'Audio',
 		
 		// Image models
@@ -110,18 +139,27 @@ const TRANSLATIONS = {
 		openAIChat: 'Открыть ИИ чат',
 		quickAIQuestion: 'Быстрый вопрос ИИ',
 		generateAIImage: 'Генерировать ИИ изображение',
+		generateAIVideo: 'Генерировать ИИ видео',
+		generateAIAudio: 'Генерировать ИИ аудио',
 		aiChat: 'ИИ чат',
 		
 		// Modal titles
 		aiChatTitle: 'ИИ чат',
 		quickQuestionTitle: 'Быстрый вопрос ИИ',
 		imageGenerationTitle: 'Генерация ИИ изображения',
+		videoGenerationTitle: 'Генерация ИИ видео',
+		audioGenerationTitle: 'Генерация ИИ аудио',
 		
 		// Labels
 		model: 'Модель',
 		prompt: 'Промпт',
 		size: 'Размер',
 		yourQuestion: 'Ваш вопрос',
+		duration: 'Длительность (секунды)',
+		aspectRatio: 'Соотношение сторон',
+		voice: 'Голос',
+		attachImage: 'Прикрепить изображение',
+		uploadImage: 'Загрузить изображение',
 		
 		// Placeholders
 		enterQuestion: 'Введите ваш вопрос...',
@@ -145,10 +183,17 @@ const TRANSLATIONS = {
 		saveError: 'Ошибка сохранения',
 		imageSaved: 'Изображение сохранено',
 		imageError: 'Не удалось сохранить изображение',
+		videoSaved: 'Видео сохранено',
+		videoError: 'Не удалось сохранить видео',
+		audioSaved: 'Аудио сохранено',
+		audioError: 'Не удалось сохранить аудио',
 		generating: 'Генерация изображения...',
+		generatingVideo: 'Генерация видео...',
+		generatingAudio: 'Генерация аудио...',
 		answerSaved: 'Ответ сохранен в заметку',
 		unexpectedResponse: 'Получен неожиданный ответ от API',
 		error: 'Ошибка',
+		imageUploaded: 'Изображение загружено',
 		
 		// User/AI labels
 		user: 'Вы',
@@ -168,6 +213,12 @@ const TRANSLATIONS = {
 		imagesFolderDesc: 'Папка, куда будут сохраняться сгенерированные изображения',
 		defaultImageModel: 'Модель изображений по умолчанию',
 		defaultImageModelDesc: 'Модель для генерации изображений по умолчанию',
+		videosFolder: 'Папка для видео',
+		videosFolderDesc: 'Папка, куда будут сохраняться сгенерированные видео',
+		defaultVideoModel: 'Модель видео по умолчанию',
+		defaultVideoModelDesc: 'Модель для генерации видео по умолчанию',
+		audioFolder: 'Папка для аудио',
+		audioFolderDesc: 'Папка, куда будут сохраняться сгенерированные аудио',
 		language: 'Язык',
 		languageDesc: 'Язык интерфейса',
 		showFreeModelsOnly: 'Показывать только бесплатные модели',
@@ -176,6 +227,7 @@ const TRANSLATIONS = {
 		// Model categories
 		categoryText: 'Текст',
 		categoryImages: 'Картинки',
+		categoryVideo: 'Видео',
 		categoryAudio: 'Аудио',
 		
 		// Image models
@@ -219,10 +271,14 @@ export default class PollinationsAIPlugin extends Plugin {
 
 	getCategoryForModel(modelName: string): string {
 		const name = modelName.toLowerCase();
+		// Video generation models
+		if (name === 'veo' || name.includes('seedance')) {
+			return this.t('categoryVideo');
+		}
 		// Image generation models
 		if (name.includes('flux') || name === 'turbo' || name === 'gptimage' || 
 		    name === 'kontext' || name.includes('seedream') || name.includes('nanobanana') ||
-		    name === 'zimage' || name === 'veo' || name.includes('seedance')) {
+		    name === 'zimage') {
 			return this.t('categoryImages');
 		}
 		// Audio models (music, speech, etc.)
@@ -234,6 +290,19 @@ export default class PollinationsAIPlugin extends Plugin {
 		return this.t('categoryText');
 	}
 
+	modelSupportsImages(modelName: string): boolean {
+		const model = this.models.find(m => m.name === modelName);
+		if (!model || !model.input_modalities) return false;
+		return model.input_modalities.indexOf('image') !== -1 || model.input_modalities.indexOf('vision') !== -1;
+	}
+
+	modelSupportsImageInput(modelName: string): boolean {
+		// Check if model supports image input based on API model data
+		const model = this.models.find(m => m.name === modelName);
+		if (!model || !model.input_modalities) return false;
+		return model.input_modalities.includes('image');
+	}
+
 	isModelFree(modelName: string): boolean {
 		const name = modelName.toLowerCase();
 		// Models available in free tier (cheapest models based on pricing)
@@ -243,7 +312,7 @@ export default class PollinationsAIPlugin extends Plugin {
 			// Image models (basic free tier)
 			'flux', 'turbo', 'gptimage', 'kontext', 'seedream', 'nanobanana', 'zimage'
 		];
-		return freeModels.includes(name);
+		return freeModels.indexOf(name) !== -1;
 	}
 
 	async onload() {
@@ -277,6 +346,24 @@ export default class PollinationsAIPlugin extends Plugin {
 			name: this.t('generateAIImage'),
 			callback: () => {
 				new ImageGenerationModal(this.app, this).open();
+			}
+		});
+
+		// Добавляем команду для генерации видео
+		this.addCommand({
+			id: 'generate-ai-video',
+			name: this.t('generateAIVideo'),
+			callback: () => {
+				new VideoGenerationModal(this.app, this).open();
+			}
+		});
+
+		// Добавляем команду для генерации аудио
+		this.addCommand({
+			id: 'generate-ai-audio',
+			name: this.t('generateAIAudio'),
+			callback: () => {
+				new AudioGenerationModal(this.app, this).open();
 			}
 		});
 
@@ -365,7 +452,7 @@ export default class PollinationsAIPlugin extends Plugin {
 		}
 	}
 
-	async communicateWithAI(modelName: string, messages: { role: string; content: string }[]): Promise<{ error?: string; choices?: Array<{ message: { content: string } }> }> {
+	async communicateWithAI(modelName: string, messages: { role: string; content: string | Array<{type: string; text?: string; image_url?: {url: string}}> }[]): Promise<{ error?: string; choices?: Array<{ message: { content: string } }> }> {
 		try {
 			const headers: Record<string, string> = {
 				'Content-Type': 'application/json'
@@ -452,13 +539,14 @@ export default class PollinationsAIPlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	async generateImage(prompt: string, model: string = 'zimage', width: number = 1024, height: number = 1024): Promise<{ error?: string; imageData?: ArrayBuffer; filename?: string }> {
+	async generateImage(prompt: string, model: string = 'zimage', width: number = 1024, height: number = 1024, referenceImage?: string | null): Promise<{ error?: string; imageData?: ArrayBuffer; filename?: string }> {
 		try {
 			// Image generation requires API key
 			if (!this.settings.apiToken) {
 				return { error: 'API key required for image generation. Please add it in settings.' };
 			}
 			
+			// Build the URL for image generation
 			const url = new URL(`https://gen.pollinations.ai/image/${encodeURIComponent(prompt)}`);
 			url.searchParams.set('model', model);
 			url.searchParams.set('width', width.toString());
@@ -466,12 +554,31 @@ export default class PollinationsAIPlugin extends Plugin {
 			url.searchParams.set('nologo', 'true');
 			url.searchParams.set('private', 'true');
 			url.searchParams.set('key', this.settings.apiToken);
+			
+			// Image-to-image: only works with public HTTP/HTTPS URLs
+			if (referenceImage && this.modelSupportsImageInput(model)) {
+				// Check if it's a public URL (not base64)
+				if (referenceImage.startsWith('http://') || referenceImage.startsWith('https://')) {
+					// Public URL - API will accept it
+					url.searchParams.set('image', referenceImage);
+					console.log('Image-to-image with URL:', referenceImage.substring(0, 100));
+				} else if (referenceImage.startsWith('data:')) {
+					// Base64 data URL - not supported due to URL length limits
+					return { 
+						error: 'Local files cannot be used for image editing. Please use a public image URL (http:// or https://) instead.' 
+					};
+				}
+			}
+
+			console.log('Generating image...');
 
 			const response = await requestUrl({
 				url: url.toString(),
 				method: 'GET',
 				throw: false
 			});
+
+			console.log('Image generation response:', { status: response.status, hasArrayBuffer: !!response.arrayBuffer });
 
 			if (response.status === 200 && response.arrayBuffer) {
 				const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
@@ -509,6 +616,139 @@ export default class PollinationsAIPlugin extends Plugin {
 			return null;
 		}
 	}
+
+	async generateVideo(prompt: string, model: string = 'veo', duration: number = 4, aspectRatio: string = '16:9', referenceImage?: string): Promise<{ error?: string; videoData?: ArrayBuffer; filename?: string }> {
+		try {
+			if (!this.settings.apiToken) {
+				return { error: 'API key required for video generation. Please add it in settings.' };
+			}
+			
+			const url = new URL(`https://gen.pollinations.ai/image/${encodeURIComponent(prompt)}`);
+			url.searchParams.set('model', model);
+			url.searchParams.set('duration', duration.toString());
+			url.searchParams.set('aspectRatio', aspectRatio);
+			url.searchParams.set('nologo', 'true');
+			url.searchParams.set('private', 'true');
+			url.searchParams.set('key', this.settings.apiToken);
+			
+			if (referenceImage) {
+				url.searchParams.set('image', referenceImage);
+			}
+
+			const response = await requestUrl({
+				url: url.toString(),
+				method: 'GET',
+				throw: false
+			});
+
+			if (response.status === 200 && response.arrayBuffer) {
+				const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+				const filename = `ai-video-${timestamp}.mp4`;
+				return { 
+					videoData: response.arrayBuffer,
+					filename
+				};
+			} else {
+				const errorText = response.text || response.json ? JSON.stringify(response.json) : 'Unknown error';
+				return { error: `HTTP ${response.status}: ${errorText}` };
+			}
+		} catch (error) {
+			return { error: error.toString() };
+		}
+	}
+
+	async saveVideo(videoData: ArrayBuffer, filename: string): Promise<string | null> {
+		try {
+			const folderPath = this.settings.videosFolder;
+			
+			if (!this.app.vault.getAbstractFileByPath(folderPath)) {
+				await this.app.vault.createFolder(folderPath);
+			}
+
+			const filePath = `${folderPath}/${filename}`;
+			await this.app.vault.createBinary(filePath, videoData);
+			
+			return filePath;
+		} catch (error) {
+			console.error('Error saving video:', error);
+			return null;
+		}
+	}
+
+	async generateAudio(text: string, voice: string = 'alloy'): Promise<{ error?: string; audioData?: ArrayBuffer; filename?: string }> {
+		try {
+			if (!this.settings.apiToken) {
+				return { error: 'API key required for audio generation. Please add it in settings.' };
+			}
+			
+			const headers: Record<string, string> = {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${this.settings.apiToken}`
+			};
+
+			const requestBody = {
+				model: 'openai',
+				messages: [{ role: 'user', content: text }],
+				modalities: ['audio'],
+				audio: {
+					voice: voice,
+					format: 'wav'
+				}
+			};
+
+			const response = await requestUrl({
+				url: 'https://gen.pollinations.ai/v1/chat/completions',
+				method: 'POST',
+				headers,
+				body: JSON.stringify(requestBody),
+				throw: false
+			});
+
+			if (response.status === 200 && response.json) {
+				const audioData = response.json.choices?.[0]?.message?.audio?.data;
+				if (audioData) {
+					// Convert base64 to ArrayBuffer
+					const binaryString = atob(audioData);
+					const bytes = new Uint8Array(binaryString.length);
+					for (let i = 0; i < binaryString.length; i++) {
+						bytes[i] = binaryString.charCodeAt(i);
+					}
+					
+					const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+					const filename = `ai-audio-${timestamp}.wav`;
+					return { 
+						audioData: bytes.buffer,
+						filename
+					};
+				} else {
+					return { error: 'No audio data in response' };
+				}
+			} else {
+				const errorText = response.text || response.json ? JSON.stringify(response.json) : 'Unknown error';
+				return { error: `HTTP ${response.status}: ${errorText}` };
+			}
+		} catch (error) {
+			return { error: error.toString() };
+		}
+	}
+
+	async saveAudio(audioData: ArrayBuffer, filename: string): Promise<string | null> {
+		try {
+			const folderPath = this.settings.audioFolder;
+			
+			if (!this.app.vault.getAbstractFileByPath(folderPath)) {
+				await this.app.vault.createFolder(folderPath);
+			}
+
+			const filePath = `${folderPath}/${filename}`;
+			await this.app.vault.createBinary(filePath, audioData);
+			
+			return filePath;
+		} catch (error) {
+			console.error('Error saving audio:', error);
+			return null;
+		}
+	}
 }
 
 class AIchatModal extends Modal {
@@ -517,6 +757,10 @@ class AIchatModal extends Modal {
 	chatContainer: HTMLElement;
 	inputElement: TextComponent;
 	modelSelect: DropdownComponent;
+	attachedImageUrl: string | null = null;
+	attachedImageEl: HTMLElement | null = null;
+	promptHistory: string[] = [];
+	historyIndex: number = -1;
 
 	constructor(app: App, plugin: PollinationsAIPlugin) {
 		super(app);
@@ -556,41 +800,49 @@ class AIchatModal extends Modal {
 		// Add models by category
 		categories.forEach((models, category) => {
 			models.forEach(model => {
-				this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
-			});
+			this.modelSelect.addOption(model.name, `[${category}] ${model.description}`);
 		});
-		
-		this.modelSelect.setValue(this.plugin.currentModel);
-		this.modelSelect.onChange((value) => {
-			this.plugin.currentModel = value;
-		});
+	});
+	
+	this.modelSelect.setValue(this.plugin.currentModel);
+	this.modelSelect.onChange((value) => {
+		this.plugin.currentModel = value;
+	});
 
-		// Контейнер для чата
-		this.chatContainer = contentEl.createDiv('chat-container');
+	// Контейнер для чата
+	this.chatContainer = contentEl.createDiv('chat-container');
 
-		// Поле ввода
+	// Контейнер для ввода
 		const inputContainer = contentEl.createDiv('input-container');
+		
 		this.inputElement = new TextComponent(inputContainer);
 		this.inputElement.inputEl.placeholder = this.plugin.t('enterQuestion');
 		this.inputElement.inputEl.addClass('input-wide');
-		this.inputElement.inputEl.addEventListener('keypress', (e) => {
+		this.inputElement.inputEl.addClass('chat-input-multiline');
+		this.inputElement.inputEl.addEventListener('keydown', (e) => {
 			if (e.key === 'Enter' && !e.shiftKey) {
 				e.preventDefault();
 				void this.sendMessage();
+			} else if (e.key === 'ArrowUp') {
+				e.preventDefault();
+				this.navigateHistory('up');
+			} else if (e.key === 'ArrowDown') {
+				e.preventDefault();
+				this.navigateHistory('down');
 			}
 		});
 
 		// Кнопка отправки
 		const sendButton = new ButtonComponent(inputContainer);
 		sendButton.setButtonText(this.plugin.t('send'));
-		sendButton.onClick(() => this.sendMessage());
+		sendButton.onClick(() => void this.sendMessage());
 
 		// Кнопки управления
 		const buttonContainer = contentEl.createDiv('button-container');
 
 		const saveButton = new ButtonComponent(buttonContainer);
 		saveButton.setButtonText(this.plugin.t('saveChat'));
-		saveButton.onClick(() => this.saveChat());
+		saveButton.onClick(() => void this.saveChat());
 
 		const clearButton = new ButtonComponent(buttonContainer);
 		clearButton.setButtonText(this.plugin.t('clear'));
@@ -601,21 +853,49 @@ class AIchatModal extends Modal {
 		const message = this.inputElement.getValue().trim();
 		if (!message) return;
 
+		// Save to history
+		this.promptHistory.push(message);
+		this.historyIndex = this.promptHistory.length;
+
 		// Добавляем сообщение пользователя
 		this.addMessage('user', message);
 		this.inputElement.setValue('');
 
-		// Проверяем, является ли модель моделью изображений
-		const isImageModel = this.plugin.getCategoryForModel(this.plugin.currentModel) === this.plugin.t('categoryImages');
+		// Проверяем, является ли модель моделью изображений/видео
+		const category = this.plugin.getCategoryForModel(this.plugin.currentModel);
+		const isImageModel = category === this.plugin.t('categoryImages');
+		const isVideoModel = category === this.plugin.t('categoryVideo');
 
 		// Показываем индикатор загрузки
 		const loadingEl = this.chatContainer.createDiv('loading-message');
 		loadingEl.textContent = '🤖 ' + this.plugin.t('thinking');
 
 		try {
-			if (isImageModel) {
+			if (isVideoModel) {
+				// Генерация видео
+				const result = await this.plugin.generateVideo(message, this.plugin.currentModel, 4, '16:9');
+				
+				loadingEl.remove();
+
+				if (result.error) {
+					this.addMessage('assistant', `${this.plugin.t('error')}: ${result.error}`);
+				} else if (result.videoData && result.filename) {
+					const filePath = await this.plugin.saveVideo(result.videoData, result.filename);
+					
+					if (filePath) {
+						this.addMessage('assistant', `${this.plugin.t('videoSaved')}: [[${filePath}]]`);
+					} else {
+						this.addMessage('assistant', this.plugin.t('videoError'));
+					}
+				}
+			} else if (isImageModel) {
 				// Генерация изображения
-				const result = await this.plugin.generateImage(message, this.plugin.currentModel, 1024, 1024);
+				const result = await this.plugin.generateImage(
+					message, 
+					this.plugin.currentModel, 
+					1024, 
+					1024
+				);
 				
 				loadingEl.remove();
 
@@ -655,6 +935,26 @@ class AIchatModal extends Modal {
 		}
 	}
 
+	navigateHistory(direction: 'up' | 'down') {
+		if (this.promptHistory.length === 0) return;
+		
+		if (direction === 'up') {
+			if (this.historyIndex > 0) {
+				this.historyIndex--;
+				this.inputElement.setValue(this.promptHistory[this.historyIndex]);
+			}
+		} else {
+			if (this.historyIndex < this.promptHistory.length - 1) {
+				this.historyIndex++;
+				this.inputElement.setValue(this.promptHistory[this.historyIndex]);
+			} else {
+				// At the end, clear input
+				this.historyIndex = this.promptHistory.length;
+				this.inputElement.setValue('');
+			}
+		}
+	}
+
 	addMessage(role: 'user' | 'assistant', content: string) {
 		const message: ChatMessage = {
 			role,
@@ -678,7 +978,6 @@ class AIchatModal extends Modal {
 		const contentDiv = messageEl.createDiv('message-content');
 		contentDiv.textContent = content;
 
-		this.chatContainer.scrollTop = this.chatContainer.scrollHeight;
 	}
 
 	async saveChat() {
@@ -744,11 +1043,9 @@ class QuickQuestionModal extends Modal {
 		
 		categories.forEach((models, category) => {
 			models.forEach(model => {
-				this.modelSelect.addOption(model.name, `[${category}] ${model.name}`);
-			});
+			this.modelSelect.addOption(model.name, `[${category}] ${model.description}`);
 		});
-		
-		this.modelSelect.setValue(this.plugin.currentModel);
+	});
 
 		// Поле ввода
 		const inputContainer = contentEl.createDiv();
@@ -827,30 +1124,37 @@ class ImageGenerationModal extends Modal {
 		this.plugin = plugin;
 	}
 
+	updateModelList() {
+		// Clear existing options
+		this.modelSelect.selectEl.empty();
+		
+		// Get image generation models from loaded models
+		const imageModels = this.plugin.models.filter(m => {
+			const category = this.plugin.getCategoryForModel(m.name);
+			return category === this.plugin.t('categoryImages');
+		});
+		
+		// Add models to dropdown
+		imageModels.forEach(model => {
+		this.modelSelect.addOption(model.name, model.description);
+	});
+	
+	// Fallback if no models available
+	if (imageModels.length === 0) {
+		}
+	}
+
 	onOpen() {
 		const { contentEl } = this;
 		contentEl.empty();
 
 		contentEl.createEl('h2', { text: this.plugin.t('imageGenerationTitle') });
 
-		// Image models
-		const imageModels = [
-			{ id: 'zimage', name: this.plugin.t('imageModelZimage') },
-			{ id: 'flux', name: this.plugin.t('imageModelFlux') },
-			{ id: 'turbo', name: this.plugin.t('imageModelTurbo') },
-			{ id: 'gptimage', name: this.plugin.t('imageModelGPT') },
-			{ id: 'kontext', name: this.plugin.t('imageModelKontext') },
-			{ id: 'seedream', name: this.plugin.t('imageModelSeeDream') },
-			{ id: 'nanobanana', name: this.plugin.t('imageModelNanobanana') }
-		];
-
 		// Model selector
 		const modelContainer = contentEl.createDiv();
 		modelContainer.createEl('label', { text: this.plugin.t('model') + ':' });
 		this.modelSelect = new DropdownComponent(modelContainer);
-		imageModels.forEach(model => {
-			this.modelSelect.addOption(model.id, model.name);
-		});
+		this.updateModelList();
 		this.modelSelect.setValue(this.plugin.settings.defaultImageModel);
 
 		// Prompt input
@@ -861,27 +1165,21 @@ class ImageGenerationModal extends Modal {
 		this.promptInput.inputEl.addClass('input-full');
 		this.promptInput.inputEl.addClass('input-tall');
 
-		// Size settings
-		const sizeContainer = contentEl.createDiv();
-		sizeContainer.createEl('label', { text: this.plugin.t('size') + ':' });
-		
-		const sizeInputContainer = sizeContainer.createDiv();
-		sizeInputContainer.setCssProps({
-			'display': 'flex',
-			'gap': '10px',
-			'align-items': 'center',
-			'margin-top': '5px'
-		});
+	// Size settings
+	const sizeContainer = contentEl.createDiv();
+	sizeContainer.createEl('label', { text: this.plugin.t('size') + ':' });
+	
+	const sizeInputContainer = sizeContainer.createDiv('size-input-container');
 
-		this.widthInput = new TextComponent(sizeInputContainer);
-		this.widthInput.setValue('1024');
-		this.widthInput.inputEl.setCssProps({ 'width': '80px' });
-		
-		sizeInputContainer.createSpan({ text: '×' });
-		
-		this.heightInput = new TextComponent(sizeInputContainer);
+	this.widthInput = new TextComponent(sizeInputContainer);
+	this.widthInput.setValue('1024');
+	this.widthInput.inputEl.addClass('dimension-input');
+	
+	sizeInputContainer.createSpan({ text: '×' });
+	
+	this.heightInput = new TextComponent(sizeInputContainer);
 		this.heightInput.setValue('1024');
-		this.heightInput.inputEl.setCssProps({ 'width': '80px' });
+		this.heightInput.inputEl.addClass('dimension-input');
 
 		// Buttons
 		const buttonContainer = contentEl.createDiv();
@@ -938,6 +1236,233 @@ class ImageGenerationModal extends Modal {
 					this.close();
 				} else {
 					new Notice(this.plugin.t('imageError'));
+				}
+			}
+		} catch (error) {
+			loadingNotice.hide();
+			new Notice(`${this.plugin.t('error')}: ${error}`);
+		}
+	}
+
+	onClose() {
+		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
+class VideoGenerationModal extends Modal {
+	plugin: PollinationsAIPlugin;
+	promptInput: TextComponent;
+	modelSelect: DropdownComponent;
+	durationInput: TextComponent;
+	aspectRatioSelect: DropdownComponent;
+
+	constructor(app: App, plugin: PollinationsAIPlugin) {
+		super(app);
+		this.plugin = plugin;
+	}
+
+	onOpen() {
+		const { contentEl } = this;
+		contentEl.empty();
+
+		contentEl.createEl('h2', { text: this.plugin.t('videoGenerationTitle') });
+
+		// Video models
+		const videoModels = [
+			{ id: 'veo', name: 'Veo (4-8s, text-to-video)' },
+			{ id: 'seedance', name: 'Seedance (2-10s, text/image-to-video)' },
+			{ id: 'seedance-pro', name: 'Seedance Pro' }
+		];
+
+		// Model selector
+		const modelContainer = contentEl.createDiv();
+		modelContainer.createEl('label', { text: this.plugin.t('model') + ':' });
+		this.modelSelect = new DropdownComponent(modelContainer);
+		videoModels.forEach(model => {
+			this.modelSelect.addOption(model.id, model.name);
+		});
+		this.modelSelect.setValue(this.plugin.settings.defaultVideoModel);
+
+		// Prompt input
+		const promptContainer = contentEl.createDiv();
+		promptContainer.createEl('label', { text: this.plugin.t('prompt') + ':' });
+		this.promptInput = new TextComponent(promptContainer);
+		this.promptInput.inputEl.placeholder = this.plugin.t('enterPrompt');
+		this.promptInput.inputEl.addClass('input-full');
+		this.promptInput.inputEl.addClass('input-tall');
+
+	// Duration settings
+	const durationContainer = contentEl.createDiv();
+	durationContainer.createEl('label', { text: this.plugin.t('duration') + ':' });
+	this.durationInput = new TextComponent(durationContainer);
+	this.durationInput.setValue('4');
+	this.durationInput.inputEl.addClass('duration-input');
+
+	// Aspect ratio
+	const aspectContainer = contentEl.createDiv();
+	aspectContainer.createEl('label', { text: this.plugin.t('aspectRatio') + ':' });
+	this.aspectRatioSelect = new DropdownComponent(aspectContainer);
+	this.aspectRatioSelect.addOption('16:9', '16:9 (Landscape)');
+	this.aspectRatioSelect.addOption('9:16', '9:16 (Portrait)');
+	this.aspectRatioSelect.setValue('16:9');
+
+	// Buttons
+	const buttonContainer = contentEl.createDiv();
+
+	const generateButton = new ButtonComponent(buttonContainer);
+	generateButton.setButtonText(this.plugin.t('generate'));
+	generateButton.setCta();
+	generateButton.onClick(() => this.generateVideo());
+
+	const cancelButton = new ButtonComponent(buttonContainer);
+	cancelButton.setButtonText(this.plugin.t('cancel'));
+	cancelButton.onClick(() => this.close());
+}
+
+	async generateVideo() {
+		const prompt = this.promptInput.getValue().trim();
+		
+		if (!prompt) {
+			new Notice(this.plugin.t('enterPromptMsg'));
+			return;
+		}
+
+		const model = this.modelSelect.getValue();
+		const duration = parseInt(this.durationInput.getValue()) || 4;
+		const aspectRatio = this.aspectRatioSelect.getValue();
+
+		const loadingNotice = new Notice(this.plugin.t('generatingVideo'), 0);
+
+		try {
+			const result = await this.plugin.generateVideo(prompt, model, duration, aspectRatio);
+
+			loadingNotice.hide();
+
+			if (result.error) {
+				new Notice(`${this.plugin.t('error')}: ${result.error}`);
+				return;
+			}
+
+			if (result.videoData && result.filename) {
+				const filePath = await this.plugin.saveVideo(result.videoData, result.filename);
+				
+				if (filePath) {
+					new Notice(`${this.plugin.t('videoSaved')}: ${filePath}`);
+					
+					// Insert video link into active note
+					const activeFile = this.app.workspace.getActiveFile();
+					if (activeFile) {
+						const editor = this.app.workspace.activeEditor?.editor;
+						if (editor) {
+							editor.replaceSelection(`![[${filePath}]]\n`);
+						}
+					}
+					
+					this.close();
+				} else {
+					new Notice(this.plugin.t('videoError'));
+				}
+			}
+		} catch (error) {
+			loadingNotice.hide();
+			new Notice(`${this.plugin.t('error')}: ${error}`);
+		}
+	}
+
+	onClose() {
+		const { contentEl } = this;
+		contentEl.empty();
+	}
+}
+
+class AudioGenerationModal extends Modal {
+	plugin: PollinationsAIPlugin;
+	textInput: TextComponent;
+	voiceSelect: DropdownComponent;
+
+	constructor(app: App, plugin: PollinationsAIPlugin) {
+		super(app);
+		this.plugin = plugin;
+	}
+
+	onOpen() {
+		const { contentEl } = this;
+		contentEl.empty();
+
+		contentEl.createEl('h2', { text: this.plugin.t('audioGenerationTitle') });
+
+		// Text input
+		const textContainer = contentEl.createDiv();
+		textContainer.createEl('label', { text: this.plugin.t('prompt') + ':' });
+		this.textInput = new TextComponent(textContainer);
+		this.textInput.inputEl.placeholder = this.plugin.t('enterPrompt');
+		this.textInput.inputEl.addClass('input-full');
+		this.textInput.inputEl.addClass('input-tall');
+
+		// Voice selector
+		const voiceContainer = contentEl.createDiv();
+		voiceContainer.createEl('label', { text: this.plugin.t('voice') + ':' });
+		this.voiceSelect = new DropdownComponent(voiceContainer);
+		const voices = ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'];
+		voices.forEach(voice => {
+			this.voiceSelect.addOption(voice, voice.charAt(0).toUpperCase() + voice.slice(1));
+		});
+		this.voiceSelect.setValue('alloy');
+
+		// Buttons
+		const buttonContainer = contentEl.createDiv();
+
+		const generateButton = new ButtonComponent(buttonContainer);
+		generateButton.setButtonText(this.plugin.t('generate'));
+		generateButton.setCta();
+		generateButton.onClick(() => this.generateAudio());
+
+		const cancelButton = new ButtonComponent(buttonContainer);
+		cancelButton.setButtonText(this.plugin.t('cancel'));
+		cancelButton.onClick(() => this.close());
+	}
+
+	async generateAudio() {
+		const text = this.textInput.getValue().trim();
+		
+		if (!text) {
+			new Notice(this.plugin.t('enterPromptMsg'));
+			return;
+		}
+
+		const voice = this.voiceSelect.getValue();
+
+		const loadingNotice = new Notice(this.plugin.t('generatingAudio'), 0);
+
+		try {
+			const result = await this.plugin.generateAudio(text, voice);
+
+			loadingNotice.hide();
+
+			if (result.error) {
+				new Notice(`${this.plugin.t('error')}: ${result.error}`);
+				return;
+			}
+
+			if (result.audioData && result.filename) {
+				const filePath = await this.plugin.saveAudio(result.audioData, result.filename);
+				
+				if (filePath) {
+					new Notice(`${this.plugin.t('audioSaved')}: ${filePath}`);
+					
+					// Insert audio link into active note
+					const activeFile = this.app.workspace.getActiveFile();
+					if (activeFile) {
+						const editor = this.app.workspace.activeEditor?.editor;
+						if (editor) {
+							editor.replaceSelection(`![[${filePath}]]\n`);
+						}
+					}
+					
+					this.close();
+				} else {
+					new Notice(this.plugin.t('audioError'));
 				}
 			}
 		} catch (error) {
@@ -1017,13 +1542,12 @@ class PollinationsAISettingTab extends PluginSettingTab {
 				
 				categories.forEach((models, category) => {
 					models.forEach(model => {
-						dropdown.addOption(model.name, `[${category}] ${model.name}`);
-					});
+					dropdown.addOption(model.name, `[${category}] ${model.description}`);
 				});
-				dropdown.setValue(this.plugin.settings.defaultModel);
-				dropdown.onChange(async (value) => {
-					this.plugin.settings.defaultModel = value;
-					this.plugin.currentModel = value;
+			});
+			
+			dropdown.setValue(this.plugin.settings.defaultModel);
+			dropdown.onChange(async (value) => {
 					await this.plugin.saveSettings();
 				});
 			});
@@ -1088,5 +1612,41 @@ class PollinationsAISettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+
+		new Setting(containerEl)
+			.setName(this.plugin.t('videosFolder'))
+			.setDesc(this.plugin.t('videosFolderDesc'))
+			.addText(text => text
+				.setPlaceholder('AI videos')
+				.setValue(this.plugin.settings.videosFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.videosFolder = value;
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName(this.plugin.t('defaultVideoModel'))
+			.setDesc(this.plugin.t('defaultVideoModelDesc'))
+			.addDropdown(dropdown => {
+				dropdown.addOption('veo', 'Veo');
+				dropdown.addOption('seedance', 'Seedance');
+				dropdown.addOption('seedance-pro', 'Seedance Pro');
+				dropdown.setValue(this.plugin.settings.defaultVideoModel);
+				dropdown.onChange(async (value) => {
+					this.plugin.settings.defaultVideoModel = value;
+					await this.plugin.saveSettings();
+				});
+			});
+
+		new Setting(containerEl)
+			.setName(this.plugin.t('audioFolder'))
+			.setDesc(this.plugin.t('audioFolderDesc'))
+			.addText(text => text
+				.setPlaceholder('AI audio')
+				.setValue(this.plugin.settings.audioFolder)
+				.onChange(async (value) => {
+					this.plugin.settings.audioFolder = value;
+					await this.plugin.saveSettings();
+				}));
 	}
 }
