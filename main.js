@@ -130,10 +130,10 @@ var TRANSLATIONS = {
     categoryVideo: "Video",
     categoryAudio: "Audio",
     // Image models
-    imageModelZimage: "Zimage (Default)",
+    imageModelZimage: "Zimage (default)",
     imageModelFlux: "Flux",
-    imageModelTurbo: "Turbo (Fast)",
-    imageModelGPT: "GPT Image",
+    imageModelTurbo: "Turbo (fast)",
+    imageModelGPT: "GPT image",
     imageModelKontext: "Kontext",
     imageModelSeeDream: "SeeDream",
     imageModelNanobanana: "Nanobanana"
@@ -486,20 +486,20 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       if (referenceImage && this.modelSupportsImageInput(model)) {
         if (referenceImage.startsWith("http://") || referenceImage.startsWith("https://")) {
           url.searchParams.set("image", referenceImage);
-          console.log("Image-to-image with URL:", referenceImage.substring(0, 100));
+          console.debug("Image-to-image with URL:", referenceImage.substring(0, 100));
         } else if (referenceImage.startsWith("data:")) {
           return {
             error: "Local files cannot be used for image editing. Please use a public image URL (http:// or https://) instead."
           };
         }
       }
-      console.log("Generating image...");
+      console.debug("Generating image...");
       const response = await (0, import_obsidian.requestUrl)({
         url: url.toString(),
         method: "GET",
         throw: false
       });
-      console.log("Image generation response:", { status: response.status, hasArrayBuffer: !!response.arrayBuffer });
+      console.debug("Image generation response:", { status: response.status, hasArrayBuffer: !!response.arrayBuffer });
       if (response.status === 200 && response.arrayBuffer) {
         const timestamp = (/* @__PURE__ */ new Date()).toISOString().slice(0, 19).replace(/:/g, "-");
         const filename = `ai-image-${timestamp}.png`;
@@ -921,8 +921,6 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
     imageModels.forEach((model) => {
       this.modelSelect.addOption(model.name, model.description);
     });
-    if (imageModels.length === 0) {
-    }
   }
   onOpen() {
     const { contentEl } = this;
@@ -1015,7 +1013,7 @@ var VideoGenerationModal = class extends import_obsidian.Modal {
     const videoModels = [
       { id: "veo", name: "Veo (4-8s, text-to-video)" },
       { id: "seedance", name: "Seedance (2-10s, text/image-to-video)" },
-      { id: "seedance-pro", name: "Seedance Pro" }
+      { id: "seedance-pro", name: "Seedance pro" }
     ];
     const modelContainer = contentEl.createDiv();
     modelContainer.createEl("label", { text: this.plugin.t("model") + ":" });
@@ -1038,8 +1036,8 @@ var VideoGenerationModal = class extends import_obsidian.Modal {
     const aspectContainer = contentEl.createDiv();
     aspectContainer.createEl("label", { text: this.plugin.t("aspectRatio") + ":" });
     this.aspectRatioSelect = new import_obsidian.DropdownComponent(aspectContainer);
-    this.aspectRatioSelect.addOption("16:9", "16:9 (Landscape)");
-    this.aspectRatioSelect.addOption("9:16", "9:16 (Portrait)");
+    this.aspectRatioSelect.addOption("16:9", "16:9 (landscape)");
+    this.aspectRatioSelect.addOption("9:16", "9:16 (portrait)");
     this.aspectRatioSelect.setValue("16:9");
     const buttonContainer = contentEl.createDiv();
     const generateButton = new import_obsidian.ButtonComponent(buttonContainer);
@@ -1254,7 +1252,7 @@ var PollinationsAISettingTab = class extends import_obsidian.PluginSettingTab {
     new import_obsidian.Setting(containerEl).setName(this.plugin.t("defaultVideoModel")).setDesc(this.plugin.t("defaultVideoModelDesc")).addDropdown((dropdown) => {
       dropdown.addOption("veo", "Veo");
       dropdown.addOption("seedance", "Seedance");
-      dropdown.addOption("seedance-pro", "Seedance Pro");
+      dropdown.addOption("seedance-pro", "Seedance pro");
       dropdown.setValue(this.plugin.settings.defaultVideoModel);
       dropdown.onChange(async (value) => {
         this.plugin.settings.defaultVideoModel = value;
