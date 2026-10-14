@@ -243,8 +243,10 @@ const TRANSLATIONS = {
 
 interface AIModel {
 	name: string;
+	aliases?: string[];
 	description: string;
 	input_modalities: string[];
+	output_modalities?: string[];
 }
 
 interface ChatMessage {
@@ -255,8 +257,10 @@ interface ChatMessage {
 
 interface APIModelResponse {
 	name: string;
+	aliases?: string[];
 	description?: string;
 	input_modalities?: string[];
+	output_modalities?: string[];
 	is_specialized?: boolean;
 }
 
@@ -269,7 +273,17 @@ export default class PollinationsAIPlugin extends Plugin {
 		return TRANSLATIONS[this.settings.language][key];
 	}
 
+	findModel(modelName: string): AIModel | undefined {
+		return this.models.find(m => m.name === modelName || m.aliases?.includes(modelName));
+	}
+
 	getCategoryForModel(modelName: string): string {
+		const outputs = this.findModel(modelName)?.output_modalities;
+		if (outputs?.includes('video')) return this.t('categoryVideo');
+		if (outputs?.includes('image')) return this.t('categoryImages');
+		if (outputs?.includes('audio')) return this.t('categoryAudio');
+		if (outputs?.includes('text')) return this.t('categoryText');
+
 		const name = modelName.toLowerCase();
 		// Video generation models
 		if (name === 'veo' || name.includes('seedance')) {
@@ -291,14 +305,14 @@ export default class PollinationsAIPlugin extends Plugin {
 	}
 
 	modelSupportsImages(modelName: string): boolean {
-		const model = this.models.find(m => m.name === modelName);
+		const model = this.findModel(modelName);
 		if (!model || !model.input_modalities) return false;
 		return model.input_modalities.indexOf('image') !== -1 || model.input_modalities.indexOf('vision') !== -1;
 	}
 
 	modelSupportsImageInput(modelName: string): boolean {
 		// Check if model supports image input based on API model data
-		const model = this.models.find(m => m.name === modelName);
+		const model = this.findModel(modelName);
 		if (!model || !model.input_modalities) return false;
 		return model.input_modalities.includes('image');
 	}
@@ -312,7 +326,8 @@ export default class PollinationsAIPlugin extends Plugin {
 			// Image models (basic free tier)
 			'flux', 'turbo', 'gptimage', 'kontext', 'seedream', 'nanobanana', 'zimage'
 		];
-		return freeModels.indexOf(name) !== -1;
+		const model = this.findModel(modelName);
+		return freeModels.some(id => id === name || model?.aliases?.includes(id));
 	}
 
 	async onload() {
@@ -420,7 +435,9 @@ export default class PollinationsAIPlugin extends Plugin {
 					.filter((m: APIModelResponse) => !m.is_specialized) // Exclude specialized models (midijourney, chickytutor)
 					.map((model: APIModelResponse) => ({
 						name: model.name,
+						aliases: model.aliases,
 						description: model.description || model.name,
+						output_modalities: model.output_modalities,
 						input_modalities: model.input_modalities || ['text']
 					}));
 				allModels.push(...textModels);
@@ -432,7 +449,9 @@ export default class PollinationsAIPlugin extends Plugin {
 					.filter((m: APIModelResponse) => !m.is_specialized)
 					.map((model: APIModelResponse) => ({
 						name: model.name,
+						aliases: model.aliases,
 						description: model.description || model.name,
+						output_modalities: model.output_modalities,
 						input_modalities: model.input_modalities || ['text']
 					}));
 				allModels.push(...imageModels);
@@ -1151,7 +1170,7 @@ class ImageGenerationModal extends Modal {
 		modelContainer.createEl('label', { text: this.plugin.t('model') + ':' });
 		this.modelSelect = new DropdownComponent(modelContainer);
 		this.updateModelList();
-		this.modelSelect.setValue(this.plugin.settings.defaultImageModel);
+		this.modelSelect.setValue(this.plugin.findModel(this.plugin.settings.defaultImageModel)?.name || this.plugin.settings.defaultImageModel);
 
 		// Prompt input
 		const promptContainer = contentEl.createDiv();

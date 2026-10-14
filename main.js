@@ -243,7 +243,19 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
   t(key) {
     return TRANSLATIONS[this.settings.language][key];
   }
+  findModel(modelName) {
+    return this.models.find((m) => {
+      var _a;
+      return m.name === modelName || ((_a = m.aliases) == null ? void 0 : _a.includes(modelName));
+    });
+  }
   getCategoryForModel(modelName) {
+    var _a;
+    const outputs = (_a = this.findModel(modelName)) == null ? void 0 : _a.output_modalities;
+    if (outputs == null ? void 0 : outputs.includes("video")) return this.t("categoryVideo");
+    if (outputs == null ? void 0 : outputs.includes("image")) return this.t("categoryImages");
+    if (outputs == null ? void 0 : outputs.includes("audio")) return this.t("categoryAudio");
+    if (outputs == null ? void 0 : outputs.includes("text")) return this.t("categoryText");
     const name = modelName.toLowerCase();
     if (name === "veo" || name.includes("seedance")) {
       return this.t("categoryVideo");
@@ -257,12 +269,12 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
     return this.t("categoryText");
   }
   modelSupportsImages(modelName) {
-    const model = this.models.find((m) => m.name === modelName);
+    const model = this.findModel(modelName);
     if (!model || !model.input_modalities) return false;
     return model.input_modalities.indexOf("image") !== -1 || model.input_modalities.indexOf("vision") !== -1;
   }
   modelSupportsImageInput(modelName) {
-    const model = this.models.find((m) => m.name === modelName);
+    const model = this.findModel(modelName);
     if (!model || !model.input_modalities) return false;
     return model.input_modalities.includes("image");
   }
@@ -286,7 +298,11 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       "nanobanana",
       "zimage"
     ];
-    return freeModels.indexOf(name) !== -1;
+    const model = this.findModel(modelName);
+    return freeModels.some((id) => {
+      var _a;
+      return id === name || ((_a = model == null ? void 0 : model.aliases) == null ? void 0 : _a.includes(id));
+    });
   }
   async onload() {
     await this.loadSettings();
@@ -364,7 +380,9 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       if (textResponse.status === 200 && textResponse.json && Array.isArray(textResponse.json)) {
         const textModels = textResponse.json.filter((m) => !m.is_specialized).map((model) => ({
           name: model.name,
+          aliases: model.aliases,
           description: model.description || model.name,
+          output_modalities: model.output_modalities,
           input_modalities: model.input_modalities || ["text"]
         }));
         allModels.push(...textModels);
@@ -372,7 +390,9 @@ var PollinationsAIPlugin = class extends import_obsidian.Plugin {
       if (imageResponse.status === 200 && imageResponse.json && Array.isArray(imageResponse.json)) {
         const imageModels = imageResponse.json.filter((m) => !m.is_specialized).map((model) => ({
           name: model.name,
+          aliases: model.aliases,
           description: model.description || model.name,
+          output_modalities: model.output_modalities,
           input_modalities: model.input_modalities || ["text"]
         }));
         allModels.push(...imageModels);
@@ -923,6 +943,7 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
     });
   }
   onOpen() {
+    var _a;
     const { contentEl } = this;
     contentEl.empty();
     contentEl.createEl("h2", { text: this.plugin.t("imageGenerationTitle") });
@@ -930,7 +951,7 @@ var ImageGenerationModal = class extends import_obsidian.Modal {
     modelContainer.createEl("label", { text: this.plugin.t("model") + ":" });
     this.modelSelect = new import_obsidian.DropdownComponent(modelContainer);
     this.updateModelList();
-    this.modelSelect.setValue(this.plugin.settings.defaultImageModel);
+    this.modelSelect.setValue(((_a = this.plugin.findModel(this.plugin.settings.defaultImageModel)) == null ? void 0 : _a.name) || this.plugin.settings.defaultImageModel);
     const promptContainer = contentEl.createDiv();
     promptContainer.createEl("label", { text: this.plugin.t("prompt") + ":" });
     this.promptInput = new import_obsidian.TextComponent(promptContainer);
